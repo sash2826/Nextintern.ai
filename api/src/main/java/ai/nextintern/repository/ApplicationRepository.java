@@ -3,19 +3,28 @@ package ai.nextintern.repository;
 import ai.nextintern.entity.Application;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface ApplicationRepository extends JpaRepository<Application, UUID> {
-    Page<Application> findByStudentId(UUID studentId, Pageable pageable);
 
-    Page<Application> findByInternshipId(UUID internshipId, Pageable pageable);
+    boolean existsByStudentIdAndInternshipId(UUID studentId, UUID internshipId);
 
     Optional<Application> findByStudentIdAndInternshipId(UUID studentId, UUID internshipId);
 
-    boolean existsByStudentIdAndInternshipId(UUID studentId, UUID internshipId);
+    @EntityGraph(attributePaths = { "student", "student.user", "internship", "internship.provider" })
+    Page<Application> findByStudentId(UUID studentId, Pageable pageable);
+
+    @EntityGraph(attributePaths = { "student", "student.user", "internship" })
+    @Query("SELECT a FROM Application a WHERE a.internship.id = :internshipId ORDER BY a.appliedAt DESC")
+    Page<Application> findByInternshipId(@Param("internshipId") UUID internshipId, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = { "student", "student.user", "internship", "internship.provider" })
+    Optional<Application> findById(UUID id);
 }

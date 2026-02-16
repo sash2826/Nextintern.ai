@@ -7,7 +7,7 @@ interface User {
     id: string;
     email: string;
     fullName: string;
-    roles: string[];
+    role: string;
 }
 
 interface AuthContextType {
@@ -31,6 +31,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         api.refresh()
             .then(res => {
                 setToken(res.accessToken);
+                // Map backend response if needed, assuming backend sends `role` string
+                // If backend sends `role` and User interface expects `role`, it matches.
                 setUser(res.user);
             })
             .catch(() => { })

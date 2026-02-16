@@ -97,6 +97,48 @@ class ApiClient {
         return this.request<any>(`/internships/${id}`);
     }
 
+    // Applications
+    async apply(internshipId: string, coverNote?: string) {
+        return this.request<any>(`/internships/${internshipId}/apply`, {
+            method: 'POST',
+            body: JSON.stringify({ coverNote }),
+        });
+    }
+
+    async withdraw(internshipId: string) {
+        return this.request<void>(`/internships/${internshipId}/apply`, {
+            method: 'DELETE',
+        });
+    }
+
+    async getMyApplications(page = 0, size = 20) {
+        const res = await this.request<any>(`/applications/my?page=${page}&size=${size}`);
+        return res;
+    }
+
+    async getInternshipApplications(internshipId: string, page = 0, size = 20) {
+        return this.request<any>(`/internships/${internshipId}/applications?page=${page}&size=${size}`);
+    }
+
+    async updateApplicationStatus(applicationId: string, status: string) {
+        return this.request<any>(`/applications/${applicationId}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status }),
+        });
+    }
+
+    // Provider Internship Management
+    async createInternship(data: any) {
+        return this.request<any>('/internships', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
+    async getMyInternships(page = 0, size = 20) {
+        return this.request<any>(`/internships/my?page=${page}&size=${size}`);
+    }
+
     // Recommendations
     async getRecommendations(token: string, limit = 10) {
         return this.request<any>(`/recommendations?limit=${limit}`, { token });
