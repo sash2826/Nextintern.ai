@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  },
+  "mappings": {
+    "properties": {
+      "id": { "type": "keyword" },
+      "title": { "type": "text" },
+      "description": { "type": "text" },
+      "skills_required": { "type": "keyword" },
+      "skills_preferred": { "type": "keyword" },
+      "skills_bonus": { "type": "keyword" },
+      "skills_all": { "type": "keyword" },
+      "category": { "type": "keyword" },
+      "location_city": { "type": "keyword" },
+      "location_state": { "type": "keyword" },
+      "location_country": { "type": "keyword" },
+      "work_mode": { "type": "keyword" },
+      "stipend_min": { "type": "integer" },
+      "stipend_max": { "type": "integer" },
+      "duration_weeks": { "type": "integer" },
+      "start_date": { "type": "date" },
+      "application_deadline": { "type": "date" },
+      "status": { "type": "keyword" },
+      "created_at": { "type": "date" },
+      "provider_id": { "type": "keyword" },
+      "provider_name": { "type": "text" },
+      "provider_verified": { "type": "boolean" }
+    }
+  }
+}

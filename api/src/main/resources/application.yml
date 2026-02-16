@@ -76,3 +76,8 @@ app:
     timeout-ms: 5000
   cors:
     allowed-origins: http://localhost:3000
+  rate-limit:
+    enabled: true
+    default-limit: 100
+    default-duration-seconds: 60
+    burst-capacity: 200
