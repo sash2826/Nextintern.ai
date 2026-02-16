@@ -1,0 +1,78 @@
+# ============================================================
+# NextIntern.ai — Spring Boot Application Config (dev profile)
+# ============================================================
+
+spring:
+  application:
+    name: nextintern-api
+
+  # ── DataSource ──
+  datasource:
+    url: jdbc:postgresql://localhost:5432/nextintern
+    username: nextintern
+    password: nextintern_dev
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 5000
+      idle-timeout: 300000
+
+  # ── JPA ──
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # ── Flyway ──
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # ── Redis ──
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000
+
+# ── Server ──
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# ── Actuator ──
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ── OpenAPI ──
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+
+# ── App Custom ──
+app:
+  jwt:
+    private-key-path: ${JWT_PRIVATE_KEY_PATH:classpath:keys/private.pem}
+    public-key-path: ${JWT_PUBLIC_KEY_PATH:classpath:keys/public.pem}
+    access-token-ttl: 900       # 15 minutes in seconds
+    refresh-token-ttl: 604800   # 7 days in seconds
+  recs:
+    service-url: ${RECS_SERVICE_URL:http://localhost:8000}
+    hmac-secret: ${RECS_HMAC_SECRET:dev-hmac-secret-change-in-prod}
+    timeout-ms: 5000
+  cors:
+    allowed-origins: http://localhost:3000

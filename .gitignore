@@ -1,0 +1,52 @@
+# === Global ===
+.env
+.env.local
+.env.*.local
+*.log
+*.pid
+*.seed
+*.pid.lock
+.DS_Store
+Thumbs.db
+
+# === Java / Spring Boot (api/) ===
+api/target/
+api/.mvn/wrapper/maven-wrapper.jar
+api/*.iml
+api/.idea/
+api/*.class
+
+# === Python / FastAPI (recs/) ===
+recs/__pycache__/
+recs/.venv/
+recs/venv/
+recs/*.egg-info/
+recs/.pytest_cache/
+recs/.mypy_cache/
+recs/.ruff_cache/
+recs/dist/
+recs/build/
+recs/models/*.pkl
+recs/models/*.joblib
+
+# === Node / Next.js (web/) ===
+web/node_modules/
+web/.next/
+web/out/
+web/.turbo/
+
+# === Docker ===
+docker-compose.override.yml
+
+# === IDE ===
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# === Infra ===
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/.terraform.lock.hcl
