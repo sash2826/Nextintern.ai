@@ -3,6 +3,9 @@ package ai.nextintern.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +47,7 @@ public class StudentProfile {
     private String locationCountry = "India";
 
     @Column(columnDefinition = "text[]")
+    @JdbcTypeCode(SqlTypes.ARRAY)
     @Builder.Default
     private String[] interests = new String[] {};
 

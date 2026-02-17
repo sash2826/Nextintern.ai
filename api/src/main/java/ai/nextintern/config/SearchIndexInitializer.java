@@ -30,19 +30,21 @@ public class SearchIndexInitializer implements CommandLineRunner {
             if (!exists) {
                 logger.info("Index {} does not exist. Creating...", INDEX_NAME);
 
-                // Define mapping (simplified for brevity, normally loaded from JSON)
-                // Using flattened skills approach: skills_required, skills_preferred, etc.
-                InputStream mappingStream = getClass().getResourceAsStream("/opensearch/mapping.json");
-
-                if (mappingStream != null) {
-                    client.indices().create(CreateIndexRequest.of(c -> c
-                            .index(INDEX_NAME)
-                            .withJson(mappingStream)));
-                    logger.info("Index {} created successfully.", INDEX_NAME);
-                } else {
-                    // Fallback simplified creation if file missing
-                    client.indices().create(CreateIndexRequest.of(c -> c.index(INDEX_NAME)));
-                    logger.warn("Index {} created without explicit mapping (mapping.json not found).", INDEX_NAME);
+                try (InputStream mappingStream = getClass().getResourceAsStream("/opensearch/mapping.json")) {
+                    if (mappingStream != null) {
+                        org.opensearch.client.json.jackson.JacksonJsonpMapper mapper = new org.opensearch.client.json.jackson.JacksonJsonpMapper();
+                        try (jakarta.json.stream.JsonParser parser = mapper.jsonProvider()
+                                .createParser(mappingStream)) {
+                            client.indices().create(CreateIndexRequest.of(c -> c
+                                    .index(INDEX_NAME)
+                                    .mappings(org.opensearch.client.opensearch._types.mapping.TypeMapping._DESERIALIZER
+                                            .deserialize(parser, mapper))));
+                        }
+                        logger.info("Index {} created successfully with mapping.", INDEX_NAME);
+                    } else {
+                        client.indices().create(CreateIndexRequest.of(c -> c.index(INDEX_NAME)));
+                        logger.warn("Index {} created without explicit mapping (mapping.json not found).", INDEX_NAME);
+                    }
                 }
             }
         } catch (Exception e) {

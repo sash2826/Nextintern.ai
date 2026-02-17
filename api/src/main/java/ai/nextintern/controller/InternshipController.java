@@ -1,6 +1,7 @@
 package ai.nextintern.controller;
 
 import ai.nextintern.dto.CreateInternshipRequest;
+import ai.nextintern.dto.UpdateInternshipRequest;
 import ai.nextintern.dto.InternshipResponse;
 import ai.nextintern.service.InternshipService;
 import jakarta.validation.Valid;
@@ -28,12 +29,13 @@ public class InternshipController {
      */
     @GetMapping
     public ResponseEntity<Page<InternshipResponse>> search(
+            @RequestParam(required = false) String query,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String workMode,
             @RequestParam(required = false) String state,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(internshipService.search(category, workMode, state, page, size));
+        return ResponseEntity.ok(internshipService.search(query, category, workMode, state, page, size));
     }
 
     /**
@@ -54,6 +56,31 @@ public class InternshipController {
             @Valid @RequestBody CreateInternshipRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(internshipService.create(userId, request));
+    }
+
+    /**
+     * PUT /api/v1/internships/{id} — update internship (provider only)
+     * Note: Access control should strictly verify ownership in a real app.
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('PROVIDER')")
+    public ResponseEntity<InternshipResponse> update(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UUID userId,
+            @Valid @RequestBody UpdateInternshipRequest request) {
+        return ResponseEntity.ok(internshipService.update(id, userId, request));
+    }
+
+    /**
+     * DELETE /api/v1/internships/{id} — delete (archive) internship (provider only)
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('PROVIDER')")
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UUID userId) {
+        internshipService.delete(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
     /**

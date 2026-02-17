@@ -41,6 +41,19 @@ services:
       timeout: 3s
       retries: 5
 
+  localstack:
+    image: localstack/localstack:3.2.0
+    container_name: nextintern-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
   opensearch:
     image: opensearchproject/opensearch:2.11.1
     container_name: nextintern-opensearch
@@ -86,6 +99,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: nextintern_dev
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      APP_OPENSEARCH_HOST: opensearch
       RECS_SERVICE_URL: http://recs:8000
       RECS_HMAC_SECRET: dev-hmac-secret-change-in-prod
       JWT_PRIVATE_KEY_PATH: /app/keys/private.pem
@@ -95,6 +109,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      opensearch:
+        condition: service_healthy
+      localstack:
+        condition: service_started
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
       interval: 10s

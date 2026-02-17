@@ -1,7 +1,8 @@
 package ai.nextintern.dto;
 
-import jakarta.validation.constraints.Pattern;
+import ai.nextintern.entity.ApplicationStatus;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateApplicationStatusRequest(
-        @Pattern(regexp = "shortlisted|accepted|rejected|withdrawn|applied", message = "Invalid status") String status) {
+                @NotNull(message = "Status is required") ApplicationStatus status) {
 }

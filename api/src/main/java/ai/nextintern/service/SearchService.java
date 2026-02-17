@@ -1,18 +1,21 @@
 package ai.nextintern.service;
 
+import ai.nextintern.dto.InternshipDocument;
+import ai.nextintern.dto.SearchResult;
 import ai.nextintern.entity.Internship;
-import ai.nextintern.entity.InternshipSkill;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.Refresh;
+import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch.core.IndexRequest;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,73 +25,103 @@ public class SearchService {
     private static final String INDEX_NAME = "internships";
 
     private final OpenSearchClient client;
-    private final ObjectMapper objectMapper;
 
-    public SearchService(OpenSearchClient client, ObjectMapper objectMapper) {
+    public SearchService(OpenSearchClient client) {
         this.client = client;
-        this.objectMapper = objectMapper;
+    }
+
+    public SearchResult searchInternships(
+            String query,
+            String category,
+            String workMode,
+            String locationState,
+            int page,
+            int size) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page index must not be less than zero");
+        }
+        if (size <= 0) {
+            throw new IllegalArgumentException("Page size must not be less than or equal to zero");
+        }
+        try {
+            int from = Math.multiplyExact(page, size);
+            BoolQuery.Builder boolQuery = new BoolQuery.Builder();
+
+            // Full text query
+            if (query != null && !query.isBlank()) {
+                boolQuery.must(m -> m.multiMatch(mm -> mm
+                        .query(query)
+                        .fields("title", "description", "skills_all")));
+            }
+
+            // Filters
+            boolQuery.filter(f -> f.term(t -> t.field("status").value(v -> v.stringValue("active"))));
+
+            if (category != null && !category.isBlank()) {
+                boolQuery.filter(f -> f.term(t -> t.field("category").value(v -> v.stringValue(category))));
+            }
+
+            if (workMode != null && !workMode.isBlank()) {
+                boolQuery.filter(f -> f.term(t -> t.field("work_mode").value(v -> v.stringValue(workMode))));
+            }
+
+            if (locationState != null && !locationState.isBlank()) {
+                boolQuery.filter(f -> f.term(t -> t.field("location_state").value(v -> v.stringValue(locationState))));
+            }
+
+            SearchRequest request = new SearchRequest.Builder()
+                    .index(INDEX_NAME)
+                    .from(from)
+                    .size(size)
+                    .query(q -> q.bool(boolQuery.build()))
+                    .build();
+
+            SearchResponse<Void> response = client.search(request, Void.class);
+
+            List<UUID> ids = response.hits().hits().stream()
+                    .map(hit -> UUID.fromString(hit.id()))
+                    .collect(Collectors.toList());
+
+            long total = response.hits().total() != null
+                    ? response.hits().total().value()
+                    : 0;
+
+            return new SearchResult(ids, total);
+
+        } catch (IOException e) {
+            logger.error("Failed to search internships", e);
+            return new SearchResult(List.of(), 0);
+        }
     }
 
     public void indexInternship(Internship internship) {
         try {
-            Map<String, Object> document = convertToDocument(internship);
-            IndexRequest<Map<String, Object>> request = IndexRequest.of(i -> i
+            InternshipDocument doc = InternshipDocument.from(internship);
+            IndexRequest<InternshipDocument> request = IndexRequest.of(i -> i
                     .index(INDEX_NAME)
                     .id(internship.getId().toString())
-                    .document(document));
+                    .document(doc)
+                    .refresh(Refresh.WaitFor));
 
             client.index(request);
             logger.info("Indexed internship: {}", internship.getId());
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error("Failed to index internship: {}", internship.getId(), e);
+            // In a real production system we might want to throw this up or add to a DLQ
+            throw new RuntimeException("Failed to index internship", e);
         }
     }
 
-    private Map<String, Object> convertToDocument(Internship internship) {
-        Map<String, Object> doc = new HashMap<>();
-        doc.put("id", internship.getId().toString());
-        doc.put("title", internship.getTitle());
-        doc.put("description", internship.getDescription());
-        doc.put("category", internship.getCategory());
-        doc.put("location_city", internship.getLocationCity());
-        doc.put("location_state", internship.getLocationState());
-        doc.put("location_country", internship.getLocationCountry());
-        doc.put("work_mode", internship.getWorkMode());
-        doc.put("stipend_min", internship.getStipendMin());
-        doc.put("stipend_max", internship.getStipendMax());
-        doc.put("duration_weeks", internship.getDurationWeeks());
-        doc.put("start_date", internship.getStartDate() != null ? internship.getStartDate().toString() : null);
-        doc.put("application_deadline",
-                internship.getApplicationDeadline() != null ? internship.getApplicationDeadline().toString() : null);
-        doc.put("status", internship.getStatus());
-        doc.put("created_at", internship.getCreatedAt().toString());
-        doc.put("provider_id", internship.getProvider().getId().toString());
-        doc.put("provider_name", internship.getProvider().getCompanyName());
-        doc.put("provider_verified", internship.getProvider().isVerified());
-
-        // Flattened skills
-        List<String> required = new ArrayList<>();
-        List<String> preferred = new ArrayList<>();
-        List<String> bonus = new ArrayList<>();
-        List<String> all = new ArrayList<>();
-
-        if (internship.getSkills() != null) {
-            for (InternshipSkill is : internship.getSkills()) {
-                String skillName = is.getSkill().getName();
-                all.add(skillName);
-                switch (is.getImportance()) {
-                    case "required" -> required.add(skillName);
-                    case "preferred" -> preferred.add(skillName);
-                    case "bonus" -> bonus.add(skillName);
-                }
-            }
+    public void deleteInternship(UUID id) {
+        try {
+            client.delete(d -> d
+                    .index(INDEX_NAME)
+                    .id(id.toString())
+                    .refresh(Refresh.WaitFor));
+            logger.info("Deleted internship from index: {}", id);
+        } catch (IOException e) {
+            logger.error("Failed to delete internship from index: {}", id, e);
+            throw new RuntimeException("Failed to delete internship from index", e);
         }
-
-        doc.put("skills_required", required);
-        doc.put("skills_preferred", preferred);
-        doc.put("skills_bonus", bonus);
-        doc.put("skills_all", all);
-
-        return doc;
     }
 }

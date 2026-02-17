@@ -32,10 +32,15 @@ public class RateLimitConfig {
     }
 
     @Bean
-    public ProxyManager<String> proxyManager(RedisClient redisClient) {
-        return LettuceBasedProxyManager.builderFor(redisClient)
+    public io.lettuce.core.api.StatefulRedisConnection<String, byte[]> redisConnection(RedisClient redisClient) {
+        return redisClient.connect(RedisCodec.of(StringCodec.UTF8, ByteArrayCodec.INSTANCE));
+    }
+
+    @Bean
+    public ProxyManager<String> proxyManager(io.lettuce.core.api.StatefulRedisConnection<String, byte[]> connection) {
+        return LettuceBasedProxyManager.builderFor(connection)
                 .withExpirationStrategy(
                         ExpirationAfterWriteStrategy.basedOnTimeForRefillingBucketUpToMax(Duration.ofMinutes(1)))
-                .build(RedisCodec.of(StringCodec.UTF8, ByteArrayCodec.INSTANCE));
+                .build();
     }
 }

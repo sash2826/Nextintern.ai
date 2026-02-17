@@ -27,7 +27,7 @@ export function Navbar() {
                         <Link href="/internships" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 transition-colors">
                             Browse
                         </Link>
-                        {user?.roles?.includes('student') && (
+                        {user?.role === 'student' && (
                             <Link href="/dashboard" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 transition-colors">
                                 Dashboard
                             </Link>
@@ -80,7 +80,7 @@ export function Navbar() {
                         <Link href="/internships" className="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
                             Browse Internships
                         </Link>
-                        {user?.roles?.includes('student') && (
+                        {user?.role === 'student' && (
                             <Link href="/dashboard" className="block px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800">
                                 Dashboard
                             </Link>

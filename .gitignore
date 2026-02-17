@@ -50,3 +50,6 @@ infra/.terraform/
 infra/*.tfstate
 infra/*.tfstate.*
 infra/.terraform.lock.hcl
+
+# === Data / Volume ===
+volume/cache/

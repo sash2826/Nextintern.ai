@@ -33,12 +33,23 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+
   # ── Redis ──
   data:
     redis:
       host: localhost
       port: 6379
       timeout: 2000
+
+  # ── AWS SQS ──
+  cloud:
+    aws:
+      sqs:
+        region: ${AWS_REGION:us-east-1}
+        endpoint: ${AWS_ENDPOINT_URL:} # Empty for prod, overridden for local
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID:}
+        secret-key: ${AWS_SECRET_ACCESS_KEY:}
 
 # ── Server ──
 server:
@@ -81,3 +92,8 @@ app:
     default-limit: 100
     default-duration-seconds: 60
     burst-capacity: 200
+  events:
+    queues:
+      internship-events: ${SQS_QUEUE_NAME:internship-events}
+      internship-events-dlq: ${SQS_DLQ_NAME:internship-events-dlq}
+      application-events: ${SQS_APP_QUEUE_NAME:application-events}

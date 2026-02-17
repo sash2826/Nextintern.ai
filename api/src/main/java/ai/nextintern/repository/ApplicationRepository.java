@@ -27,4 +27,10 @@ public interface ApplicationRepository extends JpaRepository<Application, UUID> 
     @Override
     @EntityGraph(attributePaths = { "student", "student.user", "internship", "internship.provider" })
     Optional<Application> findById(UUID id);
+
+    long countByInternshipIdAndStatus(@Param("internshipId") UUID internshipId,
+            @Param("status") ai.nextintern.entity.ApplicationStatus status);
+
+    @Query("SELECT a FROM Application a WHERE a.id = :id AND a.internship.provider.id = :providerId")
+    Optional<Application> findByIdAndInternshipProviderId(@Param("id") UUID id, @Param("providerId") UUID providerId);
 }

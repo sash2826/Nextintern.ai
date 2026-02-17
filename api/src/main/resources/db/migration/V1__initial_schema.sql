@@ -165,8 +165,8 @@ CREATE TABLE applications (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     student_id     UUID NOT NULL REFERENCES student_profiles (id),
     internship_id  UUID NOT NULL REFERENCES internships (id),
-    status         VARCHAR(20) NOT NULL DEFAULT 'applied'
-                   CHECK (status IN ('applied', 'shortlisted', 'accepted', 'rejected', 'withdrawn')),
+    status         VARCHAR(20) NOT NULL DEFAULT 'APPLIED'
+                   CHECK (status IN ('APPLIED', 'SHORTLISTED', 'HIRED', 'REJECTED', 'WITHDRAWN')),
     status_history JSONB NOT NULL DEFAULT '[]'::jsonb,
     cover_note     TEXT,
     applied_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
