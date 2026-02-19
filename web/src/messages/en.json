@@ -1,0 +1,16 @@
+{
+    "Navbar": {
+        "dashboard": "Dashboard",
+        "internships": "Internships",
+        "login": "Login",
+        "admin": "Admin",
+        "provider": "Provider Dashboard",
+        "logout": "Logout"
+    },
+    "Common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "save": "Save",
+        "cancel": "Cancel"
+    }
+}

@@ -32,6 +32,14 @@ public class StudentController {
         return ResponseEntity.ok(profileService.updateProfile(userId, request));
     }
 
+    @PutMapping("/skills")
+    public ResponseEntity<Void> updateSkills(
+            @AuthenticationPrincipal UUID userId,
+            @Valid @RequestBody ai.nextintern.dto.UpdateStudentSkillsRequest request) {
+        profileService.updateSkills(userId, request);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/profile/completeness")
     public ResponseEntity<java.util.Map<String, Integer>> getCompleteness(
             @AuthenticationPrincipal UUID userId) {

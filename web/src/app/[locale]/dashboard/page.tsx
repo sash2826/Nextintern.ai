@@ -28,7 +28,7 @@ export default function DashboardPage() {
 
     return (
         <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20">
-            {user.role === 'PROVIDER' ? <ProviderDashboard /> : <StudentDashboard />}
+            {user.roles.includes('ROLE_PROVIDER') ? <ProviderDashboard /> : <StudentDashboard />}
         </main>
     );
 }

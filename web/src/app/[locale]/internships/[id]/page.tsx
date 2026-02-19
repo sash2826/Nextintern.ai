@@ -24,7 +24,7 @@ export default function InternshipDetailPage() {
         api.getInternship(id as string)
             .then(data => {
                 setIntern(data);
-                if (token && user?.role === 'STUDENT') {
+                if (token && user?.roles.includes('ROLE_STUDENT')) {
                     // Check if already applied (fetch recent applications)
                     // Optimization: dedicated endpoint check would be better, using list for MVP
                     api.getMyApplications(0, 100).then(res => {
@@ -67,9 +67,9 @@ export default function InternshipDetailPage() {
 
     if (!intern) return null;
 
-    const isProvider = user?.role === 'PROVIDER';
+    const isProvider = user?.roles.includes('ROLE_PROVIDER');
     const isOwner = isProvider && user?.id === intern.provider?.id;
-    const isStudent = user?.role === 'STUDENT';
+    const isStudent = user?.roles.includes('ROLE_STUDENT');
     const requiredSkills = intern.skills?.filter((s: any) => s.importance === 'required') || [];
     const preferredSkills = intern.skills?.filter((s: any) => s.importance === 'preferred') || [];
     const bonusSkills = intern.skills?.filter((s: any) => s.importance === 'bonus') || [];
@@ -83,7 +83,7 @@ export default function InternshipDetailPage() {
                         ← Back
                     </button>
                     {isOwner && (
-                        <Link href={`/internships/${id}/manage`} className="text-sm font-semibold text-primary-600 hover:text-primary-700">
+                        <Link href={`/provider/internships/${id}/applications`} className="text-sm font-semibold text-primary-600 hover:text-primary-700">
                             Manage Applications →
                         </Link>
                     )}
@@ -202,8 +202,8 @@ export default function InternshipDetailPage() {
                                 application ? (
                                     <div className="text-center">
                                         <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-bold mb-3 ${application.status === 'accepted' ? 'bg-green-100 text-green-800' :
-                                                application.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                    'bg-blue-100 text-blue-800'
+                                            application.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-blue-100 text-blue-800'
                                             }`}>
                                             Status: {application.status.toUpperCase()}
                                         </div>
@@ -223,7 +223,7 @@ export default function InternshipDetailPage() {
                                     </>
                                 )
                             ) : isOwner ? (
-                                <Link href={`/internships/${id}/manage`} className="w-full sm:w-auto text-center px-10 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:opacity-90 transition-all">
+                                <Link href={`/provider/internships/${id}/applications`} className="w-full sm:w-auto text-center px-10 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:opacity-90 transition-all">
                                     Manage Applications
                                 </Link>
                             ) : (

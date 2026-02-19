@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
     Optional<Skill> findByNameIgnoreCase(String name);
+
+    java.util.List<Skill> findByNameContainingIgnoreCase(String name);
 }

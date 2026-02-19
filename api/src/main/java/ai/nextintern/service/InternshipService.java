@@ -40,17 +40,22 @@ public class InternshipService {
 
                 Internship internship = Internship.builder()
                                 .provider(provider)
-                                .title(request.title())
-                                .description(request.description())
-                                .category(request.category())
+                                .title(ai.nextintern.security.SanitizationUtils.strict(request.title()))
+                                .description(ai.nextintern.security.SanitizationUtils
+                                                .basicFormatting(request.description()))
+                                .category(ai.nextintern.security.SanitizationUtils.strict(request.category()))
                                 .stipendMin(request.stipendMin())
                                 .stipendMax(request.stipendMax())
-                                .locationCity(request.locationCity())
-                                .locationState(request.locationState())
+                                .locationCity(ai.nextintern.security.SanitizationUtils.strict(request.locationCity()))
+                                .locationState(ai.nextintern.security.SanitizationUtils.strict(request.locationState()))
                                 .locationCountry(
-                                                request.locationCountry() != null ? request.locationCountry() : "India")
-                                .workMode(request.workMode())
-                                .eligibility(request.eligibility())
+                                                request.locationCountry() != null
+                                                                ? ai.nextintern.security.SanitizationUtils
+                                                                                .strict(request.locationCountry())
+                                                                : "India")
+                                .workMode(ai.nextintern.security.SanitizationUtils.strict(request.workMode()))
+                                .eligibility(ai.nextintern.security.SanitizationUtils
+                                                .basicFormatting(request.eligibility()))
                                 .durationWeeks(request.durationWeeks())
                                 .startDate(request.startDate())
                                 .applicationDeadline(request.applicationDeadline())
@@ -76,25 +81,30 @@ public class InternshipService {
                 }
 
                 if (request.title() != null)
-                        internship.setTitle(request.title());
+                        internship.setTitle(ai.nextintern.security.SanitizationUtils.strict(request.title()));
                 if (request.description() != null)
-                        internship.setDescription(request.description());
+                        internship.setDescription(ai.nextintern.security.SanitizationUtils
+                                        .basicFormatting(request.description()));
                 if (request.category() != null)
-                        internship.setCategory(request.category());
+                        internship.setCategory(ai.nextintern.security.SanitizationUtils.strict(request.category()));
                 if (request.stipendMin() != null)
                         internship.setStipendMin(request.stipendMin());
                 if (request.stipendMax() != null)
                         internship.setStipendMax(request.stipendMax());
                 if (request.locationCity() != null)
-                        internship.setLocationCity(request.locationCity());
+                        internship.setLocationCity(
+                                        ai.nextintern.security.SanitizationUtils.strict(request.locationCity()));
                 if (request.locationState() != null)
-                        internship.setLocationState(request.locationState());
+                        internship.setLocationState(
+                                        ai.nextintern.security.SanitizationUtils.strict(request.locationState()));
                 if (request.locationCountry() != null)
-                        internship.setLocationCountry(request.locationCountry());
+                        internship.setLocationCountry(
+                                        ai.nextintern.security.SanitizationUtils.strict(request.locationCountry()));
                 if (request.workMode() != null)
-                        internship.setWorkMode(request.workMode());
+                        internship.setWorkMode(ai.nextintern.security.SanitizationUtils.strict(request.workMode()));
                 if (request.eligibility() != null)
-                        internship.setEligibility(request.eligibility());
+                        internship.setEligibility(ai.nextintern.security.SanitizationUtils
+                                        .basicFormatting(request.eligibility()));
                 if (request.durationWeeks() != null)
                         internship.setDurationWeeks(request.durationWeeks());
                 if (request.startDate() != null)

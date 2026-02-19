@@ -98,7 +98,7 @@ public class ApplicationService {
                 .student(student)
                 .internship(internship)
                 .status(ApplicationStatus.APPLIED) // Strict Enum
-                .coverNote(request.coverNote())
+                .coverNote(ai.nextintern.security.SanitizationUtils.basicFormatting(request.coverNote()))
                 .appliedAt(Instant.now())
                 .statusHistory(createInitialHistory())
                 .build();

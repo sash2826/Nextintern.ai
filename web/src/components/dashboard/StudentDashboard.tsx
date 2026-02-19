@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
+import EditProfileModal from './EditProfileModal';
 
 export default function StudentDashboard() {
     const { user, token } = useAuth();
@@ -11,35 +12,48 @@ export default function StudentDashboard() {
     const [recommendations, setRecommendations] = useState<any[]>([]);
     const [applications, setApplications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
-    useEffect(() => {
-        if (!token) return;
-
+    const fetchData = () => {
+        setLoading(true);
         Promise.all([
-            api.getProfile(token).catch(() => null),
-            api.getRecommendations(token, 6).catch(() => ({ items: [] })),
+            api.getProfile(token!).catch(() => null),
+            api.getRecommendations(token!, 6).catch(() => ({ items: [] })),
             api.getMyApplications().catch(() => ({ content: [] })),
         ]).then(([profileData, recsData, appsData]) => {
             setProfile(profileData);
             setRecommendations(recsData?.items || []);
             setApplications(appsData?.content || []);
         }).finally(() => setLoading(false));
+    };
+
+    useEffect(() => {
+        if (!token) return;
+        fetchData();
     }, [token]);
 
     const completeness = profile?.profileCompleteness || 0;
 
-    if (loading) return <div className="p-10 text-center">Loading dashboard...</div>;
+    if (loading && !profile) return <div className="p-10 text-center">Loading dashboard...</div>;
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             {/* Welcome Header */}
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-                    Welcome, {user?.fullName?.split(' ')[0]} 👋
-                </h1>
-                <p className="mt-2 text-lg text-gray-500 dark:text-gray-400">
-                    Student Dashboard
-                </p>
+            <div className="mb-8 flex justify-between items-end">
+                <div>
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
+                        Welcome, {user?.fullName?.split(' ')[0]} 👋
+                    </h1>
+                    <p className="mt-2 text-lg text-gray-500 dark:text-gray-400">
+                        Student Dashboard
+                    </p>
+                </div>
+                <button
+                    onClick={() => setIsEditOpen(true)}
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition shadow-sm"
+                >
+                    Edit Profile
+                </button>
             </div>
 
             {/* Stats Cards */}
@@ -138,6 +152,15 @@ export default function StudentDashboard() {
                     <p className="text-gray-500">No recommendations yet.</p>
                 )}
             </div>
+
+            <EditProfileModal
+                isOpen={isEditOpen}
+                onClose={() => setIsEditOpen(false)}
+                profile={profile}
+                onSuccess={() => {
+                    fetchData(); // Refresh data
+                }}
+            />
         </div>
     );
 }

@@ -1,0 +1,64 @@
+# ============================================================
+# NextIntern.ai — Dependabot Configuration
+# Automated dependency updates for all ecosystems
+# ============================================================
+version: 2
+
+updates:
+  # ── Maven (Spring Boot API) ──────────────────────────────
+  - package-ecosystem: maven
+    directory: /api
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*"
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  # ── npm (Next.js Frontend) ──────────────────────────────
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      next-ecosystem:
+        patterns:
+          - "next*"
+          - "react*"
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  # ── pip (FastAPI Recommender) ───────────────────────────
+  - package-ecosystem: pip
+    directory: /recs
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  # ── GitHub Actions ─────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns:
+          - "*"

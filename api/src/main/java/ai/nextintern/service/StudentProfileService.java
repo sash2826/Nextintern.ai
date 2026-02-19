@@ -37,45 +37,83 @@ public class StudentProfileService {
     public StudentProfileResponse updateProfile(UUID userId, UpdateProfileRequest request) {
         StudentProfile profile = profileRepository.findByUserId(userId)
                 .orElseThrow(() -> new NoSuchElementException("Profile not found"));
+        User user = profile.getUser();
 
-        // Update basic fields
+        // Update User fields
+        if (request.fullName() != null && !request.fullName().isBlank()) {
+            user.setFullName(ai.nextintern.security.SanitizationUtils.strict(request.fullName()));
+            userRepository.save(user);
+        }
+
+        // Update Profile fields
         if (request.educationLevel() != null)
-            profile.setEducationLevel(request.educationLevel());
+            profile.setEducationLevel(ai.nextintern.security.SanitizationUtils.strict(request.educationLevel()));
         if (request.university() != null)
-            profile.setUniversity(request.university());
-        if (request.graduationYear() != null)
-            profile.setGraduationYear(request.graduationYear());
+            profile.setUniversity(ai.nextintern.security.SanitizationUtils.strict(request.university()));
+        // graduationYear removed from request in favor of simpler MVP
         if (request.locationCity() != null)
-            profile.setLocationCity(request.locationCity());
+            profile.setLocationCity(ai.nextintern.security.SanitizationUtils.strict(request.locationCity()));
         if (request.locationState() != null)
-            profile.setLocationState(request.locationState());
-        if (request.locationCountry() != null)
-            profile.setLocationCountry(request.locationCountry());
-        if (request.interests() != null)
-            profile.setInterests(request.interests().toArray(new String[0]));
-        if (request.bio() != null)
-            profile.setBio(request.bio());
+            profile.setLocationState(ai.nextintern.security.SanitizationUtils.strict(request.locationState()));
+        // locationCountry defaults to India, kept as is
 
-        // Update skills
-        if (request.skills() != null) {
-            profile.getSkills().clear();
-            for (UpdateProfileRequest.SkillInput si : request.skills()) {
-                Skill skill = skillRepository.findByNameIgnoreCase(si.name())
-                        .orElseGet(() -> {
-                            Skill s = Skill.builder().name(si.name()).build();
-                            return skillRepository.save(s);
-                        });
-                StudentSkill ss = StudentSkill.builder()
-                        .studentProfile(profile)
-                        .skill(skill)
-                        .proficiency((short) si.proficiency())
-                        .build();
-                profile.getSkills().add(ss);
-            }
+        if (request.interests() != null) {
+            String[] sanitizedInterests = request.interests().stream()
+                    .map(ai.nextintern.security.SanitizationUtils::strict)
+                    .toArray(String[]::new);
+            profile.setInterests(sanitizedInterests);
+        }
+
+        if (request.resumeUrl() != null)
+            profile.setResumeUrl(ai.nextintern.security.SanitizationUtils.strict(request.resumeUrl()));
+
+        if (request.bio() != null)
+            profile.setBio(ai.nextintern.security.SanitizationUtils.basicFormatting(request.bio()));
+
+        // Skills updated via separate endpoint
+
+        profileRepository.save(profile);
+        return toResponse(profile, user);
+    }
+
+    @Transactional
+    public void updateSkills(UUID userId, ai.nextintern.dto.UpdateStudentSkillsRequest request) {
+        StudentProfile profile = profileRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException("Profile not found"));
+
+        // Delete existing skills
+        // Note: Repository must have deleteByStudentProfileId
+        // We can also do it via the entity collection if orphanRemoval=true,
+        // but explicit repository delete is often cleaner for batch replace.
+        // However, since we defined the repository method, we'll try to use it.
+        // Or better, use the entity collection to ensure Hibernate sync.
+
+        profile.getSkills().clear();
+
+        // Save to trigger delete of orphans?
+        // Better to flush?
+        // Let's stick to the user's plan: deleteByStudentProfileId
+        // But to use deleteByStudentProfileId, we need the ID of the profile.
+        // And we should clear the collection in memory too to avoid confusion.
+
+        // Actually, for @OneToMany with orphanRemoval=true, clearing the list is
+        // enough.
+        // Let's rely on JPA standard behavior first.
+
+        for (ai.nextintern.dto.UpdateStudentSkillsRequest.SkillUpdateDTO dto : request.getSkills()) {
+            Skill skill = skillRepository.findById(dto.getSkillId())
+                    .orElseThrow(() -> new NoSuchElementException("Skill not found: " + dto.getSkillId()));
+
+            StudentSkill ss = StudentSkill.builder()
+                    .studentProfile(profile)
+                    .skill(skill)
+                    .proficiency(dto.getProficiency().shortValue())
+                    .build();
+
+            profile.getSkills().add(ss);
         }
 
         profileRepository.save(profile);
-        return toResponse(profile, profile.getUser());
     }
 
     private StudentProfileResponse toResponse(StudentProfile profile, User user) {
