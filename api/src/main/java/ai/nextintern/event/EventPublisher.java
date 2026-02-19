@@ -45,7 +45,8 @@ public class EventPublisher {
                     .queue(internshipEventsQueue)
                     .payload(finalEvent));
 
-            log.debug("Event published successfully: id={}, type={}", event.eventId(), event.eventType());
+            log.debug("Event published successfully: id={}, type={}, traceId={}",
+                    event.eventId(), event.eventType(), event.traceId());
         } catch (Exception e) {
             log.error("Failed to publish event {}", event.eventId(), e);
             throw e;
@@ -74,7 +75,8 @@ public class EventPublisher {
             }
 
             final ai.nextintern.dto.ApplicationEvent finalEvent = event;
-            log.info("Publishing application event {} to queue {}", event.applicationId(), applicationEventsQueue);
+            log.info("Publishing application event appId={}, type={} to queue {}",
+                    event.applicationId(), event.eventType(), applicationEventsQueue);
             sqsTemplate.send(to -> to
                     .queue(applicationEventsQueue)
                     .payload(finalEvent));

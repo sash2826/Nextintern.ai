@@ -52,7 +52,7 @@ class EventIntegrationTest {
 
         // Then
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            verify(eventConsumer).consume(argThat(e -> e.eventId().equals(eventId)));
+            verify(eventConsumer).consume(argThat(e -> e != null && e.eventId().equals(eventId)));
         });
     }
 }
