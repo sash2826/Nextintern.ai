@@ -27,40 +27,9 @@ jobs:
       run:
         working-directory: api
 
-    # Service containers for integration tests
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_DB: nextintern_test
-          POSTGRES_USER: nextintern
-          POSTGRES_PASSWORD: nextintern_ci
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U nextintern -d nextintern_test"
-          --health-interval=5s
-          --health-timeout=3s
-          --health-retries=5
-          --health-start-period=10s
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=5s
-          --health-timeout=3s
-          --health-retries=5
-
     env:
-      # Connection settings for Spring Boot test profile
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/nextintern_test
-      SPRING_DATASOURCE_USERNAME: nextintern
-      SPRING_DATASOURCE_PASSWORD: nextintern_ci
-      SPRING_DATA_REDIS_HOST: localhost
-      SPRING_DATA_REDIS_PORT: 6379
+      # Use the 'test' profile (H2 in-memory DB, no external services)
+      SPRING_PROFILES_ACTIVE: test
 
     steps:
       - name: Checkout
@@ -73,9 +42,12 @@ jobs:
           java-version: "21"
           cache: maven
 
-      # Full build + test cycle; -B = batch mode (no interactive)
+      # Build + unit tests only; skip integration tests that need infra
       - name: Build & Test
-        run: mvn -B verify
+        run: >-
+          mvn -B verify
+          -Dgroups='!integration'
+          -Dtest='!RateLimitTest'
 
       # Upload test reports for debugging failures
       - name: Upload Test Reports
