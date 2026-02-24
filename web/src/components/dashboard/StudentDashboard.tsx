@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
@@ -69,7 +69,7 @@ export default function StudentDashboard() {
     const [loading, setLoading] = useState(true);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
-    const fetchData = () => {
+    const fetchData = useCallback(() => {
         setLoading(true);
         Promise.all([
             api.getProfile(token!).catch(() => null),
@@ -80,12 +80,12 @@ export default function StudentDashboard() {
             setRecommendations(recsData?.items || []);
             setApplications(appsData?.content || []);
         }).finally(() => setLoading(false));
-    };
+    }, [token]);
 
     useEffect(() => {
         if (!token) return;
         fetchData();
-    }, [token]);
+    }, [token, fetchData]);
 
     const completeness = profile?.profileCompleteness || 0;
 
