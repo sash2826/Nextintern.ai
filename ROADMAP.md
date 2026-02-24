@@ -1,0 +1,93 @@
+# Project Roadmap: NextIntern.ai
+
+## Phase 1: MVP & Foundations
+
+- [x] **P1.1 Auth System**
+  - [x] JWT Implementation (In Code: `JwtAuthFilter`)
+  - [x] Refresh Token Rotation (HttpOnly Cookie)
+  - [x] Logout & Blocklist (Redis)
+- [x] **P1.2 Security Foundations**
+  - [x] Input Validation (Sanitization - Jsoup)
+  - [x] CORS Configuration (Strict Whitelist - `CorsFilter`)
+- [x] **P1.3 Rate Limiting**
+  - [x] Spring Filter + Redis Implementation (Verified)
+- [x] **P1.4 Search Infrastructure**
+  - [x] OpenSearch Cluster Setup (Docker)
+  - [x] Index Mapping (Flattened Skills - `SearchIndexInitializer`)
+  - [x] Postgres -> OpenSearch Sync Logic
+- [x] **P1.5 Search UI**
+  - [x] Filter Panel & Type-ahead
+  - [x] Responsive Results Grid
+- [x] **P1.6 Recommendation Caching**
+  - [x] Redis Cache Logic (TTL 1h)
+- [x] **P1.7 Event Pipeline**
+  - [x] Add SQS Dependencies (`spring-cloud-aws-starter-sqs`)
+  - [x] Configure SQS (`application.yml` + `application-local.yml`)
+  - [x] Event Producer (`EventPublisher.java`)
+  - [x] Event Consumer (`EventConsumer.java`)
+  - [x] Unit Tests (Mocks)
+  - [x] Integration Tests (LocalStack)
+- [x] **P1.8 Application Flow**
+  - [x] Create/Update `Application` entity with `ApplicationStatus` enum and `statusHistory` JSON
+  - [x] Create `SavedInternship` entity
+  - [x] Implement `ApplicationRepository` with finding by provider/student
+  - [x] Implement `SavedInternshipRepository`
+  - [x] Implement `ApplicationService` with strict state transitions and event logic
+  - [x] Implement `SavedInternshipService`
+  - [x] Implement `ApplicationController` and `SavedInternshipController`
+  - [x] Implement `ApplicationIntegrationTest` (`GET /internships/{id}/applicants`)
+- [x] **P1.9 Provider Dashboard**
+- [x] **P1.10 Admin Dashboard & Audit**
+- [x] **P1.11 PWA Basics**
+- [x] **P1.12 Internationalization (i18n)**
+- [x] **P1.13 CI/CD Pipeline**
+- [x] **P1.14 Staging Deployment**
+- [x] **P1.15 Seed Data Generation**
+  - [x] Basic SQL Seed Data (V2__seed_data.sql + V4__seed_applications_events.sql)
+
+
+- [x] **P1.X Bug Fixes & Maintenance**
+  - [x] **Config & Utils**
+    - [x] `SearchIndexInitializer`: Fix resource leak (InputStream/JsonParser) — already uses try-with-resources
+    - [x] `EventPublisher`: Redact PII from debug logs
+  - [x] **Controllers & Security**
+    - [x] `InternshipController`: Fix IDOR in update (verify owner) — ownership check exists
+    - [x] `InternshipController`: Fix IDOR in delete (verify owner) — ownership check exists
+  - [x] **Services & Logic**
+    - [x] `ApplicationService`: Null-safe access check (user/provider) — null-safe chain exists
+    - [x] `InternshipService`: Fix race condition in skill creation — catch block exists
+    - [x] `InternshipService`: Fix N+1 query (batch count applications) — batch query exists
+    - [x] `InternshipService`: Clamp pagination size — Math.min exists
+    - [x] `SearchService`: Validate pagination parameters — validation exists
+  - [x] **DTOs & Validation**
+    - [x] `InternshipDocument`: Null safety in loops/provider access — null checks exist
+    - [x] `UpdateInternshipRequest`: Add stipendMax validation (@Min, cross-field) — @Min + isStipendRangeValid exists
+  - [x] **User Feedback Fixes**
+    - [x] `StudentProfile`: Fix `interests` text[] mapping
+    - [x] `InternshipRepository`: Guard `countActiveApplicationsByIds` against empty list
+    - [x] `SearchService`: Prevent integer overflow in paging
+    - [x] `SavedInternshipService`: Fix non-ASCII characters in log
+    - [x] `V3 Migration`: Handle duplicates before adding unique constraint
+  - [x] **Dependencies & Environment**
+    - [x] Fix Config / Dependencies
+    - [x] Pin `scikit-learn` in `recs/requirements.txt` to `1.4.1.post1`
+    - [x] Add `volume/cache` to `.gitignore` and remove from git if tracked
+    - [x] Run full regression suite (`mvn test`, `pytest`)
+  - [x] **Tests**
+    - [x] `EventIntegrationTest`: Null safety in argument matcher
+
+## Phase 2: Production Hardening
+- [ ] P2.1 LightFM Training Pipeline
+- [/] P2.2 Hybrid Combiner + Cold-start (recs service exists)
+- [ ] P2.3 Fairness Layer
+- [ ] P2.4 Fairness Tests
+- [ ] P2.5 Explainability UI
+- [ ] P2.6 Retrain Pipeline + Shadow Mode
+- [ ] P2.7 Model Rollback API
+- [ ] P2.8 Admin Fairness Dashboard
+- [ ] P2.9 Recommendation Logging
+- [ ] P2.10 Observability Stack
+- [ ] P2.11 Load Testing
+- [ ] P2.12 Security Audit
+- [ ] P2.13 Production Deploy
+- [ ] P2.14 Additional Languages
