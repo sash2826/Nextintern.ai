@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function UserManagement() {
     const [users, setUsers] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(true);
+    const toast = useToast();
 
     useEffect(() => {
         loadUsers(page);
@@ -15,7 +17,7 @@ export default function UserManagement() {
     const loadUsers = (p: number) => {
         setLoading(true);
         api.getUsers(p)
-            .then(data => setUsers(data.content)) // Assuming Page<User> returns content array
+            .then(data => setUsers(data.content))
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
     };
@@ -23,65 +25,84 @@ export default function UserManagement() {
     const handleBanToggle = async (user: any) => {
         if (!confirm(`Are you sure you want to ${user.isActive ? 'ban' : 'unban'} ${user.fullName}?`)) return;
 
-        // Optimistic update
         setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isActive: !u.isActive } : u));
 
         try {
             if (user.isActive) {
                 await api.banUser(user.id);
+                toast.success(`${user.fullName} has been banned`);
             } else {
                 await api.unbanUser(user.id);
+                toast.success(`${user.fullName} has been unbanned`);
             }
         } catch (err) {
-            alert('Action failed');
-            // Rollback
+            toast.error('Action failed');
             setUsers(prev => prev.map(u => u.id === user.id ? { ...u, isActive: user.isActive } : u));
         }
     };
 
-    return (
-        <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">User Management</h1>
+    if (loading && users.length === 0) {
+        return (
+            <div className="space-y-6">
+                <div className="h-10 w-48 bg-gray-200 dark:bg-gray-800 rounded-lg animate-shimmer" />
+                <div className="h-96 bg-gray-200 dark:bg-gray-800 rounded-2xl animate-shimmer" />
+            </div>
+        );
+    }
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    return (
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">User Management</h1>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">View and manage all platform users.</p>
+            </div>
+
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 dark:bg-gray-700/50 text-gray-500 font-medium">
+                    <table className="data-table">
+                        <thead>
                             <tr>
-                                <th className="px-6 py-4">Name</th>
-                                <th className="px-6 py-4">Email</th>
-                                <th className="px-6 py-4">Role</th>
-                                <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Joined</th>
-                                <th className="px-6 py-4">Actions</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody>
                             {users.map(user => (
-                                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
-                                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{user.fullName}</td>
-                                    <td className="px-6 py-4 text-gray-500">{user.email}</td>
-                                    <td className="px-6 py-4">
+                                <tr key={user.id}>
+                                    <td className="font-medium text-gray-900 dark:text-white">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-300">
+                                                {user.fullName?.charAt(0)?.toUpperCase()}
+                                            </div>
+                                            {user.fullName}
+                                        </div>
+                                    </td>
+                                    <td className="text-gray-500 dark:text-gray-400">{user.email}</td>
+                                    <td>
                                         <div className="flex gap-1">
                                             {user.roles.map((r: any) => (
-                                                <span key={r.id} className="px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 text-xs font-mono">{r.name.replace('ROLE_', '')}</span>
+                                                <span key={r.id} className="badge badge-info text-xs">{r.name.replace('ROLE_', '')}</span>
                                             ))}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${user.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    <td>
+                                        <span className={`badge ${user.isActive ? 'badge-success' : 'badge-error'}`}>
                                             {user.isActive ? 'Active' : 'Banned'}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-gray-500">{new Date(user.createdAt).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4">
+                                    <td className="text-gray-500 dark:text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</td>
+                                    <td>
                                         <button
                                             onClick={() => handleBanToggle(user)}
                                             disabled={user.roles.some((r: any) => r.name === 'ROLE_ADMIN')}
-                                            className={`px-3 py-1 rounded text-xs font-bold transition-colors ${user.isActive
-                                                    ? 'bg-red-50 text-red-600 hover:bg-red-100'
-                                                    : 'bg-green-50 text-green-600 hover:bg-green-100'
-                                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${user.isActive
+                                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40'
+                                                : 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40'
+                                                } disabled:opacity-40 disabled:cursor-not-allowed`}
                                         >
                                             {user.isActive ? 'Ban' : 'Unban'}
                                         </button>
@@ -92,13 +113,29 @@ export default function UserManagement() {
                     </table>
                 </div>
                 {users.length === 0 && !loading && (
-                    <div className="p-8 text-center text-gray-500">No users found.</div>
+                    <div className="p-12 text-center">
+                        <div className="text-3xl mb-2">👤</div>
+                        <p className="text-gray-500 dark:text-gray-400">No users found.</p>
+                    </div>
                 )}
             </div>
-            <div className="flex justify-between items-center mt-4">
-                <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="px-4 py-2 bg-white dark:bg-gray-800 rounded border disabled:opacity-50">Previous</button>
-                <span className="text-sm text-gray-500">Page {page + 1}</span>
-                <button onClick={() => setPage(p => p + 1)} className="px-4 py-2 bg-white dark:bg-gray-800 rounded border">Next</button>
+
+            {/* Pagination */}
+            <div className="flex justify-between items-center">
+                <button
+                    disabled={page === 0}
+                    onClick={() => setPage(p => p - 1)}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 transition-colors"
+                >
+                    ← Previous
+                </button>
+                <span className="text-sm text-gray-500 dark:text-gray-400 font-medium">Page {page + 1}</span>
+                <button
+                    onClick={() => setPage(p => p + 1)}
+                    className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                    Next →
+                </button>
             </div>
         </div>
     );

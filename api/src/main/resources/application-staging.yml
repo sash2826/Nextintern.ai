@@ -1,0 +1,13 @@
+# ── Staging Profile ──────────────────────────────────────────
+# Used in Docker Compose deployments (Oracle Cloud, staging)
+# SQS connects to ElasticMQ (free SQS-compatible) via env vars
+spring:
+  cloud:
+    aws:
+      sqs:
+        endpoint: ${AWS_ENDPOINT_URL:}
+      credentials:
+        access-key: ${AWS_ACCESS_KEY_ID:test}
+        secret-key: ${AWS_SECRET_ACCESS_KEY:test}
+      region:
+        static: ${AWS_REGION:us-east-1}

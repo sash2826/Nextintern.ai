@@ -86,7 +86,9 @@ app:
     hmac-secret: ${RECS_HMAC_SECRET:dev-hmac-secret-change-in-prod}
     timeout-ms: 5000
   cors:
-    allowed-origins: http://localhost:3000
+    allowed-origins: http://localhost:3000,http://localhost:3002
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:457877307490-vkcoktbf1er2d7v0pced8bltocj0m9fn.apps.googleusercontent.com}
   rate-limit:
     enabled: true
     default-limit: 100

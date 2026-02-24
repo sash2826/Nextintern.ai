@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useToast } from '@/components/ui/ToastProvider';
 
 interface Applicant {
     id: string; // Application ID
@@ -22,6 +23,7 @@ export default function ApplicationList({ internshipId }: { internshipId: string
     const [applications, setApplications] = useState<Applicant[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const toast = useToast();
 
     useEffect(() => {
         const fetchApps = async () => {
@@ -50,7 +52,7 @@ export default function ApplicationList({ internshipId }: { internshipId: string
         } catch (err) {
             // Rollback
             setApplications(previousApps);
-            alert('Failed to update status');
+            toast.error('Failed to update status');
         }
     };
 

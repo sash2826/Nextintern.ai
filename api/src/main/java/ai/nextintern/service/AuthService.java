@@ -1,10 +1,12 @@
 package ai.nextintern.service;
 
 import ai.nextintern.dto.AuthResponse;
+import ai.nextintern.dto.GoogleAuthRequest;
 import ai.nextintern.dto.LoginRequest;
 import ai.nextintern.dto.RegisterRequest;
 import ai.nextintern.entity.*;
 import ai.nextintern.repository.*;
+import ai.nextintern.security.GoogleTokenVerifier;
 import ai.nextintern.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,19 +26,22 @@ public class AuthService {
     private final ProviderRepository providerRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final GoogleTokenVerifier googleTokenVerifier;
 
     public AuthService(UserRepository userRepository,
             RoleRepository roleRepository,
             StudentProfileRepository studentProfileRepository,
             ProviderRepository providerRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService) {
+            JwtService jwtService,
+            GoogleTokenVerifier googleTokenVerifier) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.providerRepository = providerRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.googleTokenVerifier = googleTokenVerifier;
     }
 
     /**
@@ -137,6 +142,77 @@ public class AuthService {
     /**
      * Logout — revoke refresh token family + block access token jti.
      */
+    /**
+     * Google OAuth login/registration.
+     * If user exists with matching googleId or email, log them in.
+     * If new user, create account with GOOGLE auth provider.
+     */
+    @Transactional
+    public AuthResult googleLogin(GoogleAuthRequest request) {
+        GoogleTokenVerifier.GoogleUser googleUser = googleTokenVerifier.verify(request.idToken());
+
+        // Try to find existing user by Google ID
+        User user = userRepository.findByGoogleId(googleUser.googleId()).orElse(null);
+
+        if (user == null) {
+            // Try to find by email (existing email/password user linking Google)
+            user = userRepository.findByEmail(googleUser.email()).orElse(null);
+
+            if (user != null) {
+                // Link Google account to existing user
+                user.setGoogleId(googleUser.googleId());
+                user.setAuthProvider("GOOGLE");
+                user.setEmailVerified(true);
+                userRepository.save(user);
+            } else {
+                // Create new user
+                String roleName = (request.role() != null && !request.role().isBlank()) ? request.role() : "student";
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid role: " + roleName));
+
+                user = User.builder()
+                        .email(googleUser.email())
+                        .fullName(googleUser.fullName())
+                        .authProvider("GOOGLE")
+                        .googleId(googleUser.googleId())
+                        .emailVerified(true)
+                        .build();
+                user.getRoles().add(role);
+                userRepository.save(user);
+
+                // Create role-specific profile
+                if ("student".equals(roleName)) {
+                    StudentProfile profile = StudentProfile.builder().user(user).build();
+                    studentProfileRepository.save(profile);
+                } else if ("provider".equals(roleName)) {
+                    Provider provider = Provider.builder()
+                            .user(user)
+                            .companyName(googleUser.fullName() + "'s Company")
+                            .build();
+                    providerRepository.save(provider);
+                }
+            }
+        }
+
+        if (!user.getIsActive()) {
+            throw new IllegalArgumentException("Account is deactivated");
+        }
+
+        user.setLastLoginAt(Instant.now());
+        userRepository.save(user);
+
+        Set<String> roleNames = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        String accessToken = jwtService.generateAccessToken(user.getId(), roleNames);
+        String refreshToken = jwtService.generateRefreshToken(user.getId(), roleNames);
+
+        return new AuthResult(
+                new AuthResponse(accessToken, toUserInfo(user, roleNames)),
+                refreshToken);
+    }
+
     public void logout(String refreshToken, String accessToken) {
         // Revoke refresh token family
         if (refreshToken != null) {

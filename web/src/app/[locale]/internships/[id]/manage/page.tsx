@@ -5,11 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function ManageApplicationsPage() {
     const { id } = useParams();
     const router = useRouter();
     const { user, token } = useAuth();
+    const toast = useToast();
     const [intern, setIntern] = useState<any>(null);
     const [applications, setApplications] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -44,7 +46,7 @@ export default function ManageApplicationsPage() {
                 a.id === appId ? { ...a, status } : a
             ));
         } catch (err: any) {
-            alert('Failed to update status');
+            toast.error('Failed to update status');
         }
     };
 

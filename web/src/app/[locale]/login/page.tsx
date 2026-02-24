@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 
 export default function LoginPage() {
-    const { login } = useAuth();
+    const { login, googleLogin } = useAuth();
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,6 +28,19 @@ export default function LoginPage() {
         }
     };
 
+    const handleGoogleSuccess = async (idToken: string) => {
+        setError('');
+        setLoading(true);
+        try {
+            await googleLogin(idToken);
+            router.push('/dashboard');
+        } catch (err: any) {
+            setError(err.message || 'Google sign-in failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-950 dark:to-primary-950 pt-16 px-4">
             <div className="w-full max-w-md">
@@ -41,6 +55,24 @@ export default function LoginPage() {
                             {error}
                         </div>
                     )}
+
+                    {/* Google Sign-In */}
+                    <div className="mb-6">
+                        <GoogleSignInButton
+                            onSuccess={handleGoogleSuccess}
+                            onError={(err) => setError(err)}
+                            text="signin_with"
+                        />
+                    </div>
+
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">or sign in with email</span>
+                        </div>
+                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>

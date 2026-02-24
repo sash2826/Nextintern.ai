@@ -53,6 +53,13 @@ class ApiClient {
         });
     }
 
+    async googleLogin(data: { idToken: string; role?: string }) {
+        return this.request<{ accessToken: string; user: any }>('/auth/google', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        });
+    }
+
     async refresh() {
         return this.request<{ accessToken: string; user: any }>('/auth/refresh', {
             method: 'POST',

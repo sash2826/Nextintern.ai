@@ -40,6 +40,13 @@ public class User {
     @Builder.Default
     private Boolean isActive = true;
 
+    @Column(name = "auth_provider", nullable = false)
+    @Builder.Default
+    private String authProvider = "LOCAL";
+
+    @Column(name = "google_id", unique = true)
+    private String googleId;
+
     @Column(name = "email_verified", nullable = false)
     @Builder.Default
     private Boolean emailVerified = false;

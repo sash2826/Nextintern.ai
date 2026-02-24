@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
 
 export default function RegisterPage() {
-    const { register } = useAuth();
+    const { register, googleLogin } = useAuth();
     const router = useRouter();
     const [form, setForm] = useState({ email: '', password: '', fullName: '', role: 'student' });
     const [error, setError] = useState('');
@@ -26,6 +27,20 @@ export default function RegisterPage() {
         }
     };
 
+    const handleGoogleSuccess = async (idToken: string) => {
+        setError('');
+        setLoading(true);
+        try {
+            // Pass the selected role for new Google sign-ups
+            await googleLogin(idToken, form.role);
+            router.push('/dashboard');
+        } catch (err: any) {
+            setError(err.message || 'Google sign-up failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-accent-50 dark:from-gray-950 dark:to-accent-950 pt-16 px-4">
             <div className="w-full max-w-md">
@@ -40,6 +55,44 @@ export default function RegisterPage() {
                             {error}
                         </div>
                     )}
+
+                    {/* Role selector - shown before Google sign-up so role is captured */}
+                    <div className="mb-5">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">I am a</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {['student', 'provider'].map(role => (
+                                <button
+                                    key={role}
+                                    type="button"
+                                    onClick={() => setForm({ ...form, role })}
+                                    className={`py-3 rounded-xl text-sm font-medium border-2 transition-all ${form.role === role
+                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                                        : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
+                                        }`}
+                                >
+                                    {role === 'student' ? '🎓 Student' : '🏢 Provider'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Google Sign-Up */}
+                    <div className="mb-6">
+                        <GoogleSignInButton
+                            onSuccess={handleGoogleSuccess}
+                            onError={(err) => setError(err)}
+                            text="signup_with"
+                        />
+                    </div>
+
+                    <div className="relative mb-6">
+                        <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                            <span className="px-4 bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400">or sign up with email</span>
+                        </div>
+                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
@@ -75,24 +128,6 @@ export default function RegisterPage() {
                                 minLength={8}
                                 required
                             />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">I am a</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {['student', 'provider'].map(role => (
-                                    <button
-                                        key={role}
-                                        type="button"
-                                        onClick={() => setForm({ ...form, role })}
-                                        className={`py-3 rounded-xl text-sm font-medium border-2 transition-all ${form.role === role
-                                                ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                                                : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
-                                            }`}
-                                    >
-                                        {role === 'student' ? '🎓 Student' : '🏢 Provider'}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
                         <button
                             type="submit"

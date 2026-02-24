@@ -1,6 +1,7 @@
 package ai.nextintern.controller;
 
 import ai.nextintern.dto.AuthResponse;
+import ai.nextintern.dto.GoogleAuthRequest;
 import ai.nextintern.dto.LoginRequest;
 import ai.nextintern.dto.RegisterRequest;
 import ai.nextintern.service.AuthService;
@@ -16,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Arrays;
 
 /**
- * Auth endpoints: register, login, refresh (via HttpOnly cookie), logout.
+ * Auth endpoints: register, login, google, refresh (via HttpOnly cookie),
+ * logout.
  * Refresh token is NEVER sent in the response body — only as a Set-Cookie.
  */
 @RestController
@@ -44,6 +46,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request,
             HttpServletResponse response) {
         AuthService.AuthResult result = authService.login(request);
+        setRefreshCookie(response, result.refreshToken());
+        return ResponseEntity.ok(result.response());
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<AuthResponse> googleLogin(@Valid @RequestBody GoogleAuthRequest request,
+            HttpServletResponse response) {
+        AuthService.AuthResult result = authService.googleLogin(request);
         setRefreshCookie(response, result.refreshToken());
         return ResponseEntity.ok(result.response());
     }

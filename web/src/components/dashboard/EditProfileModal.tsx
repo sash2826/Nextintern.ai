@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useToast } from '@/components/ui/ToastProvider';
 
 type Props = {
     isOpen: boolean;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }: Props) {
+    const toast = useToast();
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         fullName: '',
@@ -113,7 +115,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
             onClose();
         } catch (err) {
             console.error(err);
-            alert('Failed to update profile');
+            toast.error('Failed to update profile');
         } finally {
             setLoading(false);
         }

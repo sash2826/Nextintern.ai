@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import '../globals.css';
 import { Navbar } from '@/components/Navbar';
 import { AuthProvider } from '@/lib/auth';
+import { ToastProvider } from '@/components/ui/ToastProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -36,8 +37,12 @@ export default async function RootLayout({
             <body className={inter.className}>
                 <NextIntlClientProvider messages={messages}>
                     <AuthProvider>
-                        <Navbar />
-                        {children}
+                        <ToastProvider>
+                            <Navbar />
+                            <div className="animate-page-enter">
+                                {children}
+                            </div>
+                        </ToastProvider>
                     </AuthProvider>
                 </NextIntlClientProvider>
             </body>
