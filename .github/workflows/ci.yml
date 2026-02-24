@@ -81,22 +81,22 @@ jobs:
         run: npm ci
 
       - name: Lint
-        run: npm run lint > ../web_lint.log 2>&1 || true
+        run: npm run lint > web_lint.log 2>&1 || true
 
       - name: Build
-        run: npm run build > ../web_build.log 2>&1 || true
+        run: npm run build > web_build.log 2>&1 || true
 
       - name: Upload Logs
         if: always()
         run: |
-          cat ../web_lint.log ../web_build.log > ../all_logs.txt || true
+          cat web_lint.log web_build.log > all_logs.txt || true
 
       - name: Upload Debug Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: web-ci-logs
-          path: ../all_logs.txt
+          path: web/all_logs.txt
           retention-days: 1
 
   # ── FastAPI Recommender ────────────────────────────────────
