@@ -78,6 +78,13 @@ export default function AdminDashboard() {
                             <p className="text-xs text-gray-500 dark:text-gray-400">View and manage user accounts</p>
                         </div>
                     </Link>
+                    <Link href="/admin/fairness" className="flex items-center gap-3 px-5 py-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-sm transition-all group">
+                        <span className="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center text-lg">⚖️</span>
+                        <div>
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors">Fairness Metrics</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">Monitor provider dominance</p>
+                        </div>
+                    </Link>
                     <Link href="/admin/audit" className="flex items-center gap-3 px-5 py-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-sm transition-all group">
                         <span className="w-10 h-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-lg">📋</span>
                         <div>

@@ -70,6 +70,7 @@ class ContentScorer:
 
             scored.append({
                 "internship_id": internship["id"],
+                "provider_id": internship["provider_id"],
                 "score": round(final_score, 4),
                 "explanation": explanation,
             })
@@ -82,7 +83,7 @@ class ContentScorer:
         """Fetch active internships with their skills from Postgres."""
         query = text("""
             SELECT
-                i.id, i.title, i.category, i.location_city, i.location_state,
+                i.id, i.provider_id, i.title, i.category, i.location_city, i.location_state,
                 i.work_mode, i.created_at,
                 COALESCE(
                     json_agg(json_build_object(

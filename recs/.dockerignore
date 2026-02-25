@@ -1,0 +1,16 @@
+.git
+.gitignore
+.env*
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+tests/
+load_tests/
+requirements-dev.txt
+model_artifacts/

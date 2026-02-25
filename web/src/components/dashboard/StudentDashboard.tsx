@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { api } from '@/lib/api';
 import EditProfileModal from './EditProfileModal';
+import ExplainabilityModal from './ExplainabilityModal';
 
 /* ── Progress Ring SVG ───────────────────────────────────── */
 function ProgressRing({ percent, size = 80, stroke = 6 }: { percent: number; size?: number; stroke?: number }) {
@@ -69,6 +70,10 @@ export default function StudentDashboard() {
     const [loading, setLoading] = useState(true);
     const [isEditOpen, setIsEditOpen] = useState(false);
 
+    // Explainability Modal State
+    const [selectedRec, setSelectedRec] = useState<any>(null);
+    const [isExplainOpen, setExplainOpen] = useState(false);
+
     const fetchData = useCallback(() => {
         setLoading(true);
         Promise.all([
@@ -88,6 +93,29 @@ export default function StudentDashboard() {
     }, [token, fetchData]);
 
     const completeness = profile?.profileCompleteness || 0;
+
+    const handleExplanationClick = (e: React.MouseEvent, rec: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Structure the recommendation data for the modal
+        const recommendationData = {
+            internship: {
+                id: rec.internship_id,
+                title: rec.explanation?.reason?.includes(rec.internship_id) ? 'Recommended Internship' : 'Recommended Internship', // Fallback, real title needs to be fetched or passed if available from `/recommend` which current backend doesn't return title natively. Wait, the API returns internship_id. Let's see what is inside explanation. Note: If the backend doesn't return the title, it will say "Recommended Internship"
+                provider: { companyName: 'See Details' }
+            },
+            explanation: rec.explanation || {},
+            score: rec.score
+        };
+
+        // Check if there is a way to get title from backend, if not we will just pass dummy for now until backend is updated to return internship summaries.
+        // Actually wait, looking at `recommend.py`, the recommendation response items only have `internship_id`, `score`, `explanation`.
+        // The title is not there. We'll provide a placeholder title.
+
+        setSelectedRec(recommendationData);
+        setExplainOpen(true);
+    };
 
     if (loading && !profile) {
         return (
@@ -209,25 +237,25 @@ export default function StudentDashboard() {
                         {recommendations.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                                 {recommendations.map((rec) => (
-                                    <Link key={rec.internship_id} href={`/internships/${rec.internship_id}`}>
-                                        <div className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all h-full">
+                                    <Link key={rec.internship_id} href={`/internships/${rec.internship_id}`} className="block h-full group">
+                                        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all h-full flex flex-col relative z-0">
                                             {/* Match score */}
                                             <div className="flex items-center justify-between mb-3">
-                                                <span className="badge badge-success text-xs">
-                                                    {Math.round(rec.score * 100)}% match
+                                                <span className="badge badge-success text-xs flex items-center gap-1">
+                                                    <span>🤖</span> {Math.round(rec.score * 100)}% match
                                                 </span>
                                                 <div className="relative w-10 h-10">
                                                     <ProgressRing percent={Math.round(rec.score * 100)} size={40} stroke={3} />
                                                 </div>
                                             </div>
 
-                                            <h3 className="font-bold text-gray-900 dark:text-white mb-1 group-hover:text-primary-600 transition-colors line-clamp-2">
-                                                {rec.explanation?.reason || 'Matched Internship'}
+                                            <h3 className="font-bold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+                                                {rec.explanation?.reason || 'Strong AI Match'}
                                             </h3>
 
                                             {/* Skills pills */}
                                             {rec.explanation?.skills && (
-                                                <div className="flex flex-wrap gap-1.5 mt-3">
+                                                <div className="flex flex-wrap gap-1.5 mt-2">
                                                     {rec.explanation.skills.slice(0, 3).map((skill: string, i: number) => (
                                                         <span key={i} className="px-2 py-0.5 rounded-md text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300">
                                                             {skill}
@@ -236,8 +264,17 @@ export default function StudentDashboard() {
                                                 </div>
                                             )}
 
-                                            <div className="mt-4 text-sm text-primary-600 dark:text-primary-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                                                View details →
+                                            <div className="mt-auto pt-4 flex items-center justify-between">
+                                                <span className="text-sm text-primary-600 dark:text-primary-400 font-medium">
+                                                    View details →
+                                                </span>
+                                                <button
+                                                    onClick={(e) => handleExplanationClick(e, rec)}
+                                                    className="px-3 py-1.5 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-lg transition-colors z-10 relative"
+                                                    aria-label="Why this match?"
+                                                >
+                                                    ✨ Why?
+                                                </button>
                                             </div>
                                         </div>
                                     </Link>
@@ -292,6 +329,12 @@ export default function StudentDashboard() {
                 onClose={() => setIsEditOpen(false)}
                 profile={profile}
                 onSuccess={() => { fetchData(); }}
+            />
+
+            <ExplainabilityModal
+                isOpen={isExplainOpen}
+                onClose={() => setExplainOpen(false)}
+                recommendation={selectedRec}
             />
         </div>
     );

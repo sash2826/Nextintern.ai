@@ -12,5 +12,36 @@
         "error": "An error occurred",
         "save": "Save",
         "cancel": "Cancel"
+    },
+    "AdminFairness": {
+        "title": "Admin Fairness Dashboard",
+        "catalog_metrics": "Catalog Representation",
+        "exposure_metrics": "Exposure Metrics",
+        "total_providers": "Total Providers",
+        "gini_index": "Gini Index",
+        "hhi_index": "HHI Index",
+        "dominance_risk": "Dominance Risk",
+        "top_providers": "Top 5 Providers"
+    },
+    "Explain": {
+        "why_recommended": "Why are you seeing this?",
+        "skills_match": "Skills Match",
+        "content_based": "Content Based",
+        "collaborative": "Collaborative Filtering",
+        "score_breakdown": "Score Breakdown",
+        "close": "Close"
+    },
+    "Toast": {
+        "success": "Success",
+        "error": "Error",
+        "info": "Information",
+        "warning": "Warning",
+        "dismiss": "Dismiss"
+    },
+    "LanguageSwitcher": {
+        "en": "English",
+        "hi": "Hindi",
+        "es": "Spanish",
+        "fr": "French"
     }
 }

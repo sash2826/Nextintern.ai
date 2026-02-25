@@ -1,15 +1,15 @@
 import { getRequestConfig } from 'next-intl/server';
 
-export const locales = ['en', 'hi'] as const;
-export type AppLocale = (typeof locales)[number];
+import { notFound } from 'next/navigation';
+import { SUPPORTED_LOCALES, Locale, DEFAULT_LOCALE } from './config/locales';
 
 export default getRequestConfig(async ({ requestLocale }) => {
     // Resolve the locale from the request (set by middleware)
-    let locale = await requestLocale;
+    const locale = await requestLocale;
 
-    // Validate - fallback to 'en' if missing or unsupported
-    if (!locale || !locales.includes(locale as AppLocale)) {
-        locale = 'en';
+    // Validate - throw notFound if missing or unsupported
+    if (!locale || !SUPPORTED_LOCALES.includes(locale as Locale)) {
+        notFound();
     }
 
     return {

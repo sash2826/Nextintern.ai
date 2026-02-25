@@ -187,6 +187,10 @@ class ApiClient {
         return this.request<any>('/admin/stats');
     }
 
+    async getAdminFairnessStats() {
+        return this.request<any>('/admin/fairness/stats');
+    }
+
     async getUsers(page = 0, size = 10) {
         return this.request<any>(`/admin/users?page=${page}&size=${size}`);
     }

@@ -1,12 +1,12 @@
 import createMiddleware from 'next-intl/middleware';
-import { locales } from './i18n';
+import { SUPPORTED_LOCALES, DEFAULT_LOCALE } from './config/locales';
 
 export default createMiddleware({
     // A list of all locales that are supported
-    locales: locales,
+    locales: SUPPORTED_LOCALES,
 
     // Used when no locale matches
-    defaultLocale: 'en',
+    defaultLocale: DEFAULT_LOCALE,
 
     // Always prefix the URL with the locale
     localePrefix: 'always'

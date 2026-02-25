@@ -1,0 +1,47 @@
+{
+    "Navbar": {
+        "dashboard": "Tableau de Bord",
+        "internships": "Stages",
+        "login": "Connexion",
+        "admin": "Admin",
+        "provider": "Tableau de Bord Fournisseur",
+        "logout": "Déconnexion"
+    },
+    "Common": {
+        "loading": "Chargement...",
+        "error": "Une erreur est survenue",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+    },
+    "AdminFairness": {
+        "title": "Tableau de Bord d'Équité Admin",
+        "catalog_metrics": "Représentation du Catalogue",
+        "exposure_metrics": "Métriques d'Exposition",
+        "total_providers": "Nombre total de fournisseurs",
+        "gini_index": "Indice Gini",
+        "hhi_index": "Indice HHI",
+        "dominance_risk": "Risque de Dominance",
+        "top_providers": "Top {count} Fournisseurs"
+    },
+    "Explain": {
+        "why_recommended": "Pourquoi voyez-vous cela ?",
+        "skills_match": "Correspondance des Compétences",
+        "content_based": "Basé sur le Contenu",
+        "collaborative": "Filtrage Collaboratif",
+        "score_breakdown": "Détail du Score",
+        "close": "Fermer"
+    },
+    "Toast": {
+        "success": "Succès",
+        "error": "Erreur",
+        "info": "Information",
+        "warning": "Avertissement",
+        "dismiss": "Rejeter"
+    },
+    "LanguageSwitcher": {
+        "en": "Anglais",
+        "hi": "Hindi",
+        "es": "Espagnol",
+        "fr": "Français"
+    }
+}

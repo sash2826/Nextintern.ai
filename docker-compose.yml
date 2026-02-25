@@ -133,6 +133,8 @@ services:
       HMAC_SECRET: dev-hmac-secret-change-in-prod
       MODEL_DIR: /app/models
       LOG_LEVEL: INFO
+      ENV: development # running production container as development mode for local localstack/postgres compat
+      WEB_CONCURRENCY: "2"
     depends_on:
       postgres:
         condition: service_healthy

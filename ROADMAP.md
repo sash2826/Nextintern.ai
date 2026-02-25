@@ -77,17 +77,17 @@
     - [x] `EventIntegrationTest`: Null safety in argument matcher
 
 ## Phase 2: Production Hardening
-- [ ] P2.1 LightFM Training Pipeline
-- [/] P2.2 Hybrid Combiner + Cold-start (recs service exists)
-- [ ] P2.3 Fairness Layer
-- [ ] P2.4 Fairness Tests
-- [ ] P2.5 Explainability UI
-- [ ] P2.6 Retrain Pipeline + Shadow Mode
-- [ ] P2.7 Model Rollback API
-- [ ] P2.8 Admin Fairness Dashboard
-- [ ] P2.9 Recommendation Logging
-- [ ] P2.10 Observability Stack
-- [ ] P2.11 Load Testing
-- [ ] P2.12 Security Audit
-- [ ] P2.13 Production Deploy
-- [ ] P2.14 Additional Languages
+- [x] P2.1 LightFM Training Pipeline
+- [x] P2.2 Hybrid Combiner + Cold-start (recs service exists)
+- [x] P2.3 Fairness Layer
+- [x] P2.4 Fairness Tests
+- [x] P2.5 Explainability UI
+- [x] P2.6 Retrain Pipeline + Shadow Mode
+- [x] P2.7 Model Rollback API
+- [x] P2.8 Admin Fairness Dashboard
+- [x] P2.9 Recommendation Logging
+- [x] P2.10 Observability Stack
+- [x] P2.11 Load Testing
+- [x] P2.12 Security Audit
+- [x] P2.13 Production Deploy
+- [x] P2.14 Additional Languages

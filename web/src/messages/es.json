@@ -1,0 +1,47 @@
+{
+    "Navbar": {
+        "dashboard": "Panel de control",
+        "internships": "Prácticas",
+        "login": "Iniciar sesión",
+        "admin": "Administrador",
+        "provider": "Panel de Proveedor",
+        "logout": "Cerrar sesión"
+    },
+    "Common": {
+        "loading": "Cargando...",
+        "error": "Error",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+    },
+    "AdminFairness": {
+        "title": "Panel de Equidad Administrativa",
+        "catalog_metrics": "Representación del Catálogo",
+        "exposure_metrics": "Métricas de Exposición",
+        "total_providers": "Proveedores Totales",
+        "gini_index": "Índice de Gini",
+        "hhi_index": "Índice HHI",
+        "dominance_risk": "Riesgo de Dominio",
+        "top_providers": "Los {count} Mejores Proveedores"
+    },
+    "Explain": {
+        "why_recommended": "¿Por qué ves esto?",
+        "skills_match": "Coincidencia de Habilidades",
+        "content_based": "Basado en Contenido",
+        "collaborative": "Filtrado Colaborativo",
+        "score_breakdown": "Desglose de Puntuación",
+        "close": "Cerrar"
+    },
+    "Toast": {
+        "success": "Éxito",
+        "error": "Error",
+        "info": "Información",
+        "warning": "Advertencia",
+        "dismiss": "Descartar"
+    },
+    "LanguageSwitcher": {
+        "en": "Inglés",
+        "hi": "Hindi",
+        "es": "Español",
+        "fr": "Francés"
+    }
+}
