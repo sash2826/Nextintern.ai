@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # Model
     model_dir: str = "./models"
 
+    # Hybrid combiner weights (must sum to 1.0)
+    content_weight: float = 0.7
+    collaborative_weight: float = 0.3
+    cold_start_min_interactions: int = 3
+
     # Runtime
     debug: bool = True
     log_level: str = "INFO"

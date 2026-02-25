@@ -78,7 +78,7 @@
 
 ## Phase 2: Production Hardening
 - [ ] P2.1 LightFM Training Pipeline
-- [/] P2.2 Hybrid Combiner + Cold-start (recs service exists)
+- [x] P2.2 Hybrid Combiner + Cold-start (recs service exists)
 - [ ] P2.3 Fairness Layer
 - [ ] P2.4 Fairness Tests
 - [ ] P2.5 Explainability UI
