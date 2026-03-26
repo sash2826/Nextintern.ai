@@ -21,8 +21,13 @@ def get_logging_engine():
         db_url = db_url.replace("postgresql://", "postgresql+asyncpg://")
     return create_async_engine(db_url)
 
-# Keep a single engine for logging to avoid connection overhead
-_logging_engine = get_logging_engine()
+def _get_engine():
+    """
+    Internal engine factory.
+
+    Kept as a separate function so tests can patch it (see `tests/test_logging.py`).
+    """
+    return get_logging_engine()
 
 async def log_recommendation(
     user_id:       UUID,
@@ -37,7 +42,7 @@ async def log_recommendation(
     Swallows exceptions to ensure the main API flow is not interrupted.
     """
     try:
-        engine = _logging_engine
+        engine = _get_engine()
         
         insert_stmt = sa.text("""
             INSERT INTO recommendation_log 

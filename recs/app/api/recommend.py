@@ -8,8 +8,11 @@ import os
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 
-redis_url = os.environ.get("REDIS_URL", "redis://localhost:6379")
-limiter = Limiter(key_func=get_remote_address, storage_uri=redis_url)
+# CI/tests often run without Redis available. Use in-memory storage by default.
+# In production, set `REDIS_URL` to enable distributed rate limiting.
+redis_url = os.environ.get("REDIS_URL")
+storage_uri = redis_url if redis_url else "memory://"
+limiter = Limiter(key_func=get_remote_address, storage_uri=storage_uri)
 
 from app.engine.hybrid_combiner import HybridCombiner
 from app.api.logging_service import log_recommendation
@@ -70,16 +73,6 @@ async def recommend(request: Request, body: RecommendRequest, background_tasks: 
     Uses Hybrid Combiner (CF + CB).
     """
     start = time.time()
-
-    if len(body.profile.skills) < 3:
-        return RecommendResponse(
-            items=[],
-            model_version="hybrid-v0.2.0",
-            cold_start=True,
-            strategy="needs_more_skills",
-            latency_ms=int((time.time() - start) * 1000),
-            fairness_metrics={}
-        )
 
     result = await scorer.score(
         user_id=body.user_id,

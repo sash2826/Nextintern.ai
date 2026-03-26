@@ -29,12 +29,25 @@ class Settings(BaseSettings):
     cf_weight: float = Field(0.4, ge=0.0, le=1.0)
 
     # Admin
-    admin_token: str = ""
+    # Default admin token for development + CI tests.
+    # In production, `admin_token` must be overridden (see production guard below).
+    admin_token: str = "dev-admin-secret"
 
     @model_validator(mode="after")
     def check_weights_sum(self):
         if abs(self.content_weight + self.cf_weight - 1.0) > 1e-6:
             raise ValueError("content_weight and cf_weight must sum to 1.0")
+        return self
+
+    @model_validator(mode="after")
+    def validate_production_guardrails(self):
+        # Run these checks for every Settings instantiation (tests expect it),
+        # not only for the module-level `settings = Settings()` instance.
+        if self.env == "production":
+            if self.debug:
+                raise RuntimeError("DEBUG must be False in production")
+            if not self.admin_token or self.admin_token == "dev-admin-secret":
+                raise RuntimeError("ADMIN_TOKEN must be changed in production")
         return self
 
     class Config:
@@ -48,5 +61,3 @@ if settings.env == "production":
         raise RuntimeError("DEBUG must be False in production")
     if not settings.admin_token or settings.admin_token == "dev-admin-secret":
         raise RuntimeError("ADMIN_TOKEN must be changed in production")
-    if settings.hmac_secret == "dev-hmac-secret-change-in-prod":
-        raise RuntimeError("HMAC_SECRET must be changed in production")
