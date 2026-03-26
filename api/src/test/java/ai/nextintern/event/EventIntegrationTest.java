@@ -2,7 +2,6 @@ package ai.nextintern.event;
 
 import ai.nextintern.event.dto.EventType;
 import ai.nextintern.event.dto.InternshipEvent;
-import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +30,6 @@ class EventIntegrationTest {
 
     @SpyBean
     private EventConsumer eventConsumer;
-
-    @Autowired
-    private SqsTemplate sqsTemplate;
 
     @Test
     void shouldPublishAndConsumeEvent() {

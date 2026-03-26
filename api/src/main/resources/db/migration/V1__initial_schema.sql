@@ -315,8 +315,16 @@ CREATE TRIGGER trg_applications_updated_at
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 
--- ── Grant read access to recs_readonly ─────────────────────
--- (Complements the default privileges set in 01-init-roles.sql)
+-- ── Create and grant read access to recs_readonly ───────────
+-- Ensures role exists before granting (safe for fresh databases)
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'recs_readonly') THEN
+        CREATE ROLE recs_readonly LOGIN PASSWORD 'r3csR0nly2026';
+    END IF;
+END
+$$;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO recs_readonly;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO recs_readonly;

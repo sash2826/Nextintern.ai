@@ -47,7 +47,7 @@ services:
     ports:
       - "4566:4566"
     environment:
-      - SERVICES=sqs
+      - SERVICES=sqs,s3
       - DEBUG=1
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
@@ -104,6 +104,11 @@ services:
       RECS_HMAC_SECRET: dev-hmac-secret-change-in-prod
       JWT_PRIVATE_KEY_PATH: /app/keys/private.pem
       JWT_PUBLIC_KEY_PATH: /app/keys/public.pem
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://localstack:4566
+      CLOUD_AWS_S3_ENDPOINT: http://localstack:4566
     depends_on:
       postgres:
         condition: service_healthy

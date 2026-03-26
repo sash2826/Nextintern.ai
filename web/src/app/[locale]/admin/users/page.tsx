@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/ToastProvider';
 
 export default function UserManagement() {
     const [users, setUsers] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(true);
+    const { token } = useAuth();
     const toast = useToast();
 
     useEffect(() => {
@@ -16,7 +18,7 @@ export default function UserManagement() {
 
     const loadUsers = (p: number) => {
         setLoading(true);
-        api.getUsers(p)
+        api.getUsers(token!, p)
             .then(data => setUsers(data.content))
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
@@ -29,10 +31,10 @@ export default function UserManagement() {
 
         try {
             if (user.isActive) {
-                await api.banUser(user.id);
+                await api.banUser(token!, user.id);
                 toast.success(`${user.fullName} has been banned`);
             } else {
-                await api.unbanUser(user.id);
+                await api.unbanUser(token!, user.id);
                 toast.success(`${user.fullName} has been unbanned`);
             }
         } catch (err) {

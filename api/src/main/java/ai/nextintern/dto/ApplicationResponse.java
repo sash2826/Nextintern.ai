@@ -1,6 +1,6 @@
 package ai.nextintern.dto;
 
-import java.time.Instant;
+
 import java.util.UUID;
 
 import ai.nextintern.entity.ApplicationStatus;

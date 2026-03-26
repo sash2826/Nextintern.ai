@@ -9,7 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+
 
 @Component
 public class SearchIndexInitializer implements CommandLineRunner {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 
 const ACTION_COLORS: Record<string, string> = {
     CREATE: 'badge-success',
@@ -13,6 +14,7 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 export default function AuditLogs() {
+    const { token } = useAuth();
     const [logs, setLogs] = useState<any[]>([]);
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -23,7 +25,7 @@ export default function AuditLogs() {
 
     const loadLogs = (p: number) => {
         setLoading(true);
-        api.getAuditLogs(p)
+        api.getAuditLogs(token!, p)
             .then(data => setLogs(data.content))
             .catch(err => console.error(err))
             .finally(() => setLoading(false));

@@ -24,6 +24,21 @@ spring:
         static: us-east-1
 
 app:
+  jwt:
+    private-key-path: classpath:keys/private.pem
+    public-key-path: classpath:keys/public.pem
+    access-token-ttl: 900
+    refresh-token-ttl: 604800
+  cors:
+    allowed-origins: http://localhost:3000
+  google:
+    client-id: test-google-client-id
+  rate-limit:
+    enabled: false
+  recs:
+    service-url: http://localhost:8000
+    hmac-secret: test-hmac-secret
+    timeout-ms: 5000
   events:
     queues:
       internship-events: internship-events

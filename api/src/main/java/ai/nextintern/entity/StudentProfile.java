@@ -51,8 +51,8 @@ public class StudentProfile {
     @Builder.Default
     private String[] interests = new String[] {};
 
-    @Column(name = "resume_url", length = 512)
-    private String resumeUrl;
+    @Column(name = "linkedin_url", length = 512)
+    private String linkedinUrl;
 
     @Column(columnDefinition = "text")
     private String bio;

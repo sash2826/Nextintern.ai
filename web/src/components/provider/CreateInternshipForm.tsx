@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/ToastProvider';
 
 export default function CreateInternshipForm() {
     const router = useRouter();
+    const { token } = useAuth();
     const toast = useToast();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -65,7 +67,7 @@ export default function CreateInternshipForm() {
                 skills: allSkills.length > 0 ? allSkills : formData.skills.split(',').map(s => s.trim()).filter(Boolean)
             };
 
-            await api.createInternship(payload);
+            await api.createInternship(token!, payload);
             toast.success('Internship posted successfully!');
             router.push('/provider/dashboard');
         } catch (err: any) {

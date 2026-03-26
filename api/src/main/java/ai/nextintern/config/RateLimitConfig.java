@@ -23,12 +23,24 @@ public class RateLimitConfig {
     @Value("${spring.data.redis.port}")
     private int redisPort;
 
+    @Value("${spring.data.redis.password:}")
+    private String redisPassword;
+
+    @Value("${app.redis.ssl:false}")
+    private boolean sslEnabled;
+
     @Bean
     public RedisClient redisClient() {
-        return RedisClient.create(RedisURI.builder()
+        RedisURI.Builder builder = RedisURI.builder()
                 .withHost(redisHost)
-                .withPort(redisPort)
-                .build());
+                .withPort(redisPort);
+        if (redisPassword != null && !redisPassword.isEmpty()) {
+            builder.withPassword(redisPassword.toCharArray());
+        }
+        if (sslEnabled) {
+            builder.withSsl(true);
+        }
+        return RedisClient.create(builder.build());
     }
 
     @Bean
@@ -37,6 +49,7 @@ public class RateLimitConfig {
     }
 
     @Bean
+    @SuppressWarnings("deprecation")
     public ProxyManager<String> proxyManager(io.lettuce.core.api.StatefulRedisConnection<String, byte[]> connection) {
         return LettuceBasedProxyManager.builderFor(connection)
                 .withExpirationStrategy(

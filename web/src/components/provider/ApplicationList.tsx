@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/ToastProvider';
 
 interface Applicant {
@@ -23,12 +24,13 @@ export default function ApplicationList({ internshipId }: { internshipId: string
     const [applications, setApplications] = useState<Applicant[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const { token } = useAuth();
     const toast = useToast();
 
     useEffect(() => {
         const fetchApps = async () => {
             try {
-                const data = await api.getApplicants(internshipId);
+                const data = await api.getApplicants(token!, internshipId);
                 // The API returns page object, content is the array
                 setApplications(data.content || []);
             } catch (err: any) {
@@ -48,7 +50,7 @@ export default function ApplicationList({ internshipId }: { internshipId: string
         ));
 
         try {
-            await api.updateApplicationStatus(appId, newStatus);
+            await api.updateApplicationStatus(token!, appId, newStatus);
         } catch (err) {
             // Rollback
             setApplications(previousApps);

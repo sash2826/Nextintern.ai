@@ -16,13 +16,16 @@ public class StudentProfileService {
     private final StudentProfileRepository profileRepository;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
+    private final StudentDocumentRepository documentRepository;
 
     public StudentProfileService(StudentProfileRepository profileRepository,
             UserRepository userRepository,
-            SkillRepository skillRepository) {
+            SkillRepository skillRepository,
+            StudentDocumentRepository documentRepository) {
         this.profileRepository = profileRepository;
         this.userRepository = userRepository;
         this.skillRepository = skillRepository;
+        this.documentRepository = documentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -64,8 +67,8 @@ public class StudentProfileService {
             profile.setInterests(sanitizedInterests);
         }
 
-        if (request.resumeUrl() != null)
-            profile.setResumeUrl(ai.nextintern.security.SanitizationUtils.strict(request.resumeUrl()));
+        if (request.linkedinUrl() != null)
+            profile.setLinkedinUrl(ai.nextintern.security.SanitizationUtils.strict(request.linkedinUrl()));
 
         if (request.bio() != null)
             profile.setBio(ai.nextintern.security.SanitizationUtils.basicFormatting(request.bio()));
@@ -125,6 +128,9 @@ public class StudentProfileService {
                         ss.getProficiency()))
                 .collect(Collectors.toList());
 
+        boolean hasCv = documentRepository.countByStudentProfileIdAndDocumentType(profile.getId(), StudentDocument.DocumentType.CV) > 0;
+        int recLetterCount = (int) documentRepository.countByStudentProfileIdAndDocumentType(profile.getId(), StudentDocument.DocumentType.RECOMMENDATION_LETTER);
+
         return new StudentProfileResponse(
                 profile.getId(),
                 user.getId(),
@@ -138,27 +144,29 @@ public class StudentProfileService {
                 profile.getLocationCountry(),
                 profile.getInterests() != null ? Arrays.asList(profile.getInterests()) : List.of(),
                 profile.getBio(),
+                profile.getLinkedinUrl(),
+                hasCv,
+                recLetterCount,
                 skillInfos,
                 computeCompleteness(profile));
     }
 
     /**
-     * Computed at read time, not stored (v3 simplification S8).
-     * Formula: (has_education + has_skills + has_location + has_interests +
-     * has_bio) * 20 = 0-100
+     * Computed at read time, not stored
+     * Formula: (filled_fields / total_fields) * 100
+     * Fields: education, skills, location, interests, bio, linkedin_url
      */
     private int computeCompleteness(StudentProfile p) {
-        int score = 0;
-        if (p.getEducationLevel() != null && !p.getEducationLevel().isBlank())
-            score += 20;
-        if (p.getSkills() != null && !p.getSkills().isEmpty())
-            score += 20;
-        if (p.getLocationCity() != null && !p.getLocationCity().isBlank())
-            score += 20;
-        if (p.getInterests() != null && p.getInterests().length > 0)
-            score += 20;
-        if (p.getBio() != null && !p.getBio().isBlank())
-            score += 20;
-        return score;
+        int filled = 0;
+        int total = 6;
+        
+        if (p.getEducationLevel() != null && !p.getEducationLevel().isBlank()) filled++;
+        if (p.getSkills() != null && !p.getSkills().isEmpty()) filled++;
+        if (p.getLocationCity() != null && !p.getLocationCity().isBlank()) filled++;
+        if (p.getInterests() != null && p.getInterests().length > 0) filled++;
+        if (p.getBio() != null && !p.getBio().isBlank()) filled++;
+        if (p.getLinkedinUrl() != null && !p.getLinkedinUrl().isBlank()) filled++;
+        
+        return (int) (((double) filled / total) * 100);
     }
 }

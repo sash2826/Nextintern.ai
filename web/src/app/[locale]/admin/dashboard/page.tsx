@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import Link from 'next/link';
 
 function StatCard({ icon, label, value, color }: { icon: string; label: string; value: number; color: string }) {
@@ -21,11 +22,12 @@ function StatCard({ icon, label, value, color }: { icon: string; label: string; 
 }
 
 export default function AdminDashboard() {
+    const { token } = useAuth();
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        api.getAdminStats()
+        api.getAdminStats(token!)
             .then(data => setStats(data))
             .catch(err => console.error(err))
             .finally(() => setLoading(false));

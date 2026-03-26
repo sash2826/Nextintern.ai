@@ -4,10 +4,8 @@ import ai.nextintern.entity.Internship;
 import ai.nextintern.entity.InternshipSkill;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public record InternshipDocument(
         String id,

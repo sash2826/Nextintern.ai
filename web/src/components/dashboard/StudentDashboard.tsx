@@ -79,7 +79,7 @@ export default function StudentDashboard() {
         Promise.all([
             api.getProfile(token!).catch(() => null),
             api.getRecommendations(token!, 6).catch(() => ({ items: [] })),
-            api.getMyApplications().catch(() => ({ content: [] })),
+            api.getMyApplications(token!).catch(() => ({ content: [] })),
         ]).then(([profileData, recsData, appsData]) => {
             setProfile(profileData);
             setRecommendations(recsData?.items || []);
@@ -254,13 +254,26 @@ export default function StudentDashboard() {
                                             </h3>
 
                                             {/* Skills pills */}
-                                            {rec.explanation?.skills && (
-                                                <div className="flex flex-wrap gap-1.5 mt-2">
-                                                    {rec.explanation.skills.slice(0, 3).map((skill: string, i: number) => (
-                                                        <span key={i} className="px-2 py-0.5 rounded-md text-xs font-medium bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300">
-                                                            {skill}
-                                                        </span>
-                                                    ))}
+                                            {rec.explanation?.matchedSkills && (
+                                                <div className="flex flex-col gap-1.5 mt-2">
+                                                    {rec.explanation.matchedSkills.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {rec.explanation.matchedSkills.slice(0, 3).map((skill: string, i: number) => (
+                                                                <span key={i} className="px-2 py-0.5 rounded-md text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+                                                                    ✓ {skill}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {rec.explanation.missingSkills && rec.explanation.missingSkills.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1.5">
+                                                            {rec.explanation.missingSkills.slice(0, 2).map((skill: string, i: number) => (
+                                                                <span key={i} className="px-2 py-0.5 rounded-md text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+                                                                    ✗ {skill}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
 
@@ -283,9 +296,13 @@ export default function StudentDashboard() {
                         ) : (
                             <div className="text-center py-12 bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
                                 <div className="text-4xl mb-3">🤖</div>
-                                <p className="text-gray-500 dark:text-gray-400 mb-3">Complete your profile to unlock AI recommendations.</p>
-                                <button onClick={() => setIsEditOpen(true)} className="text-primary-600 hover:text-primary-700 font-semibold text-sm">
-                                    Update Profile →
+                                <p className="text-gray-500 dark:text-gray-400 mb-3">
+                                    {profile?.skills?.length < 3 
+                                        ? "Complete your profile (add at least 3 skills) to unlock AI recommendations!"
+                                        : "Complete your profile to unlock better AI recommendations."}
+                                </p>
+                                <button onClick={() => setIsEditOpen(true)} className="inline-flex items-center gap-1 px-4 py-2 mt-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 shadow-sm transition-colors text-sm font-medium">
+                                    Update Profile <span aria-hidden="true">&rarr;</span>
                                 </button>
                             </div>
                         )}

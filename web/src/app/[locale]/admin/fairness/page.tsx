@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 
 function MetricCard({ title, value, subtitle }: { title: string; value: string | number; subtitle?: string }) {
     return (
@@ -29,12 +30,13 @@ function DominanceBadge({ risk }: { risk: string }) {
 }
 
 export default function FairnessDashboard() {
+    const { token } = useAuth();
     const [stats, setStats] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        api.getAdminFairnessStats()
+        api.getAdminFairnessStats(token!)
             .then((data: any) => setStats(data))
             .catch((err: any) => setError(err.message))
             .finally(() => setLoading(false));

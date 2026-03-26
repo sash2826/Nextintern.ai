@@ -106,61 +106,61 @@ INSERT INTO internships (id, provider_id, title, description, category, stipend_
    'Full-Stack Web Developer Intern',
    'Join our engineering team to build modern web applications using React and Spring Boot. You will work on real projects serving thousands of users, participate in code reviews, and learn industry best practices.',
    'Web Development', 15000, 25000, 'Bangalore', 'Karnataka', 'hybrid', 12,
-   '2026-04-01', '2026-03-15', 50, 'active'),
+   '2027-04-01', '2027-03-15', 50, 'active'),
 
   ('f0000000-0000-0000-0000-000000000002', 'd0000000-0000-0000-0000-000000000001',
    'Backend Engineering Intern — Java',
    'Work on our core API platform built with Spring Boot and PostgreSQL. Design RESTful APIs, write performant database queries, and contribute to our microservices architecture.',
    'Backend', 18000, 30000, 'Hyderabad', 'Telangana', 'onsite', 16,
-   '2026-05-01', '2026-04-01', 30, 'active'),
+   '2027-05-01', '2027-04-01', 30, 'active'),
 
   ('f0000000-0000-0000-0000-000000000003', 'd0000000-0000-0000-0000-000000000002',
    'Machine Learning Research Intern',
    'Research and implement state-of-the-art ML models for NLP and recommendation systems. Work with PyTorch, transformers, and large-scale data pipelines.',
    'AI/ML', 25000, 40000, NULL, NULL, 'remote', 24,
-   '2026-04-15', '2026-03-31', 10, 'active'),
+   '2027-04-15', '2027-03-31', 10, 'active'),
 
   ('f0000000-0000-0000-0000-000000000004', 'd0000000-0000-0000-0000-000000000002',
    'Data Science Intern',
    'Analyze large datasets, build predictive models, and create dashboards for business insights. Work with Python, Pandas, SQL, and Tableau.',
    'Data Science', 12000, 20000, 'Mumbai', 'Maharashtra', 'hybrid', 12,
-   '2026-04-01', '2026-03-20', 25, 'active'),
+   '2027-04-01', '2027-03-20', 25, 'active'),
 
   ('f0000000-0000-0000-0000-000000000005', 'd0000000-0000-0000-0000-000000000003',
    'AI/NLP Engineer Intern',
    'Develop NLP pipelines for document understanding and automated summarization. Experience with transformers and language models preferred.',
    'AI/ML', 20000, 35000, 'Bangalore', 'Karnataka', 'hybrid', 16,
-   '2026-05-01', '2026-04-15', 15, 'active'),
+   '2027-05-01', '2027-04-15', 15, 'active'),
 
   ('f0000000-0000-0000-0000-000000000006', 'd0000000-0000-0000-0000-000000000003',
    'Computer Vision Intern',
    'Build and optimize computer vision models for real-time object detection and image classification using PyTorch and ONNX.',
    'AI/ML', 22000, 35000, 'Pune', 'Maharashtra', 'onsite', 12,
-   '2026-06-01', '2026-05-15', 8, 'active'),
+   '2027-06-01', '2027-05-15', 8, 'active'),
 
   ('f0000000-0000-0000-0000-000000000007', 'd0000000-0000-0000-0000-000000000004',
    'Frontend Developer Intern — React',
    'Design and implement beautiful, accessible user interfaces with React, Next.js, and Tailwind CSS. Collaborate with designers and backend engineers.',
    'Frontend', 10000, 18000, 'Delhi', 'Delhi', 'remote', 8,
-   '2026-04-01', '2026-03-20', 40, 'active'),
+   '2027-04-01', '2027-03-20', 40, 'active'),
 
   ('f0000000-0000-0000-0000-000000000008', 'd0000000-0000-0000-0000-000000000004',
    'Mobile App Developer Intern',
    'Build cross-platform mobile applications using Flutter. Work on real features, performance optimization, and app store deployment.',
    'Mobile', 12000, 20000, 'Chennai', 'Tamil Nadu', 'hybrid', 12,
-   '2026-05-01', '2026-04-10', 20, 'active'),
+   '2027-05-01', '2027-04-10', 20, 'active'),
 
   ('f0000000-0000-0000-0000-000000000009', 'd0000000-0000-0000-0000-000000000005',
    'Cloud & DevOps Intern',
    'Set up CI/CD pipelines, manage Kubernetes clusters, and implement infrastructure as code with Terraform on AWS.',
    'DevOps', 20000, 30000, NULL, NULL, 'remote', 16,
-   '2026-04-15', '2026-04-01', 12, 'active'),
+   '2027-04-15', '2027-04-01', 12, 'active'),
 
   ('f0000000-0000-0000-0000-000000000010', 'd0000000-0000-0000-0000-000000000005',
    'Cybersecurity Analyst Intern',
    'Perform security assessments, vulnerability scanning, and penetration testing. Learn about threat modeling and security best practices.',
    'Security', 18000, 28000, 'Bangalore', 'Karnataka', 'onsite', 12,
-   '2026-06-01', '2026-05-20', 10, 'active');
+   '2027-06-01', '2027-05-20', 10, 'active');
 
 -- ── Internship Skills ──────────────────────────────────────
 

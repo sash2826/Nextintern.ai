@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import ProviderStats from '@/components/provider/ProviderStats';
 import InternshipList from '@/components/provider/InternshipList';
 import Link from 'next/link';
 
 export default function ProviderDashboardPage() {
+    const { token } = useAuth();
     const [internships, setInternships] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const data = await api.getProviderInternships();
+                const data = await api.getProviderInternships(token!);
                 setInternships(data.content || []);
             } catch (error) {
                 console.error('Failed to load internships', error);

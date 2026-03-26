@@ -91,6 +91,61 @@ public class AdminController {
         return ResponseEntity.ok(auditLogRepository.findAll(pageable));
     }
 
+    // ── Admin internship management ─────────────────────────
+    @GetMapping("/internships")
+    public ResponseEntity<Page<?>> getAdminInternships(
+            @RequestParam(required = false) String status,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        if (status != null && !status.isEmpty()) {
+            return ResponseEntity.ok(internshipRepository.findByStatus(status, pageable));
+        }
+        return ResponseEntity.ok(internshipRepository.findAll(pageable));
+    }
+
+    @PatchMapping("/internships/{id}/status")
+    public ResponseEntity<Void> updateInternshipStatus(
+            @PathVariable UUID id,
+            @RequestBody java.util.Map<String, String> body,
+            @AuthenticationPrincipal User admin,
+            HttpServletRequest request) {
+        var internship = internshipRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Internship not found"));
+        String newStatus = body.get("status");
+        internship.setStatus(newStatus);
+        internshipRepository.save(internship);
+
+        auditService.log(
+                admin.getId(),
+                "UPDATE_STATUS",
+                "INTERNSHIP",
+                id.toString(),
+                "Status changed to: " + newStatus,
+                extractIp(request));
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/internships/{id}")
+    public ResponseEntity<Void> deleteInternship(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User admin,
+            HttpServletRequest request) {
+        if (!internshipRepository.existsById(id)) {
+            throw new RuntimeException("Internship not found");
+        }
+        internshipRepository.deleteById(id);
+
+        auditService.log(
+                admin.getId(),
+                "DELETE",
+                "INTERNSHIP",
+                id.toString(),
+                "Internship deleted by admin",
+                extractIp(request));
+
+        return ResponseEntity.ok().build();
+    }
+
     private String extractIp(HttpServletRequest request) {
         String xfHeader = request.getHeader("X-Forwarded-For");
         if (xfHeader == null || xfHeader.isEmpty()) {

@@ -16,6 +16,9 @@ public record StudentProfileResponse(
         String locationCountry,
         List<String> interests,
         String bio,
+        String linkedinUrl,
+        boolean hasCv,
+        int recommendationLetterCount,
         List<SkillInfo> skills,
         int profileCompleteness) {
     public record SkillInfo(

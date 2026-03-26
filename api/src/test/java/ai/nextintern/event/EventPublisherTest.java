@@ -2,7 +2,6 @@ package ai.nextintern.event;
 
 import ai.nextintern.event.dto.EventType;
 import ai.nextintern.event.dto.InternshipEvent;
-import io.awspring.cloud.sqs.operations.SendResult;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.UUID;
-import java.util.function.Consumer;
+
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -42,12 +41,12 @@ class EventPublisherTest {
                 "trace-123",
                 null);
 
-        when(sqsTemplate.send(any(Consumer.class))).thenReturn(null);
+        when(sqsTemplate.send(any())).thenReturn(null);
 
         // When
         eventPublisher.publish(event);
 
         // Then
-        verify(sqsTemplate).send(any(Consumer.class));
+        verify(sqsTemplate).send(any());
     }
 }

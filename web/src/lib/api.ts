@@ -35,7 +35,8 @@ class ApiClient {
         }
 
         if (res.status === 204) return {} as T;
-        return res.json();
+        const text = await res.text();
+        return text ? JSON.parse(text) : ({} as T);
     }
 
     // Auth
@@ -66,10 +67,11 @@ class ApiClient {
         });
     }
 
-    async updateLocale(locale: string) {
+    async updateLocale(token: string, locale: string) {
         return this.request<void>('/users/me/locale', {
             method: 'PATCH',
             body: JSON.stringify({ locale }),
+            token,
         });
     }
 
@@ -102,6 +104,35 @@ class ApiClient {
         return this.request<any[]>(`/skills?q=${encodeURIComponent(query)}`);
     }
 
+    // Documents
+    async uploadDocument(token: string, file: File, type: string) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('type', type);
+
+        const res = await fetch(`${this.baseUrl}/students/documents`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        if (!res.ok) {
+            const error = await res.json().catch(() => ({ message: 'Upload failed' }));
+            throw new Error(error.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+    }
+
+    async getDocuments(token: string) {
+        return this.request<any[]>('/students/documents', { token });
+    }
+
+    async deleteDocument(token: string, id: string) {
+        return this.request<void>(`/students/documents/${id}`, { method: 'DELETE', token });
+    }
+
     // Internships
     async searchInternships(params: {
         page?: number;
@@ -128,45 +159,49 @@ class ApiClient {
     }
 
     // Applications
-    async apply(internshipId: string, coverNote?: string) {
+    async apply(token: string, internshipId: string, coverNote?: string) {
         return this.request<any>(`/internships/${internshipId}/apply`, {
             method: 'POST',
             body: JSON.stringify({ coverNote }),
+            token,
         });
     }
 
-    async withdraw(internshipId: string) {
+    async withdraw(token: string, internshipId: string) {
         return this.request<void>(`/internships/${internshipId}/apply`, {
             method: 'DELETE',
+            token,
         });
     }
 
-    async getMyApplications(page = 0, size = 20) {
-        const res = await this.request<any>(`/applications/my?page=${page}&size=${size}`);
+    async getMyApplications(token: string, page = 0, size = 20) {
+        const res = await this.request<any>(`/applications/my?page=${page}&size=${size}`, { token });
         return res;
     }
 
-    async getInternshipApplications(internshipId: string, page = 0, size = 20) {
-        return this.request<any>(`/internships/${internshipId}/applications?page=${page}&size=${size}`);
+    async getInternshipApplications(token: string, internshipId: string, page = 0, size = 20) {
+        return this.request<any>(`/internships/${internshipId}/applications?page=${page}&size=${size}`, { token });
     }
 
-    async updateApplicationStatus(applicationId: string, status: string) {
+    async updateApplicationStatus(token: string, applicationId: string, status: string) {
         return this.request<any>(`/applications/${applicationId}/status`, {
             method: 'PATCH',
             body: JSON.stringify({ status }),
+            token,
         });
     }
 
     // Provider Internship Management
-    async createInternship(data: any) {
+    async createInternship(token: string, data: any) {
         return this.request<any>('/internships', {
             method: 'POST',
             body: JSON.stringify(data),
+            token,
         });
     }
 
-    async getMyInternships(page = 0, size = 20) {
-        return this.request<any>(`/internships/my?page=${page}&size=${size}`);
+    async getMyInternships(token: string, page = 0, size = 20) {
+        return this.request<any>(`/internships/my?page=${page}&size=${size}`, { token });
     }
 
     async getRecommendations(token: string, limit = 10) {
@@ -174,37 +209,55 @@ class ApiClient {
     }
 
     // Provider Specific (P1.9)
-    async getProviderInternships() {
-        return this.request<any>('/internships/my?size=100'); // Fetch all for now or implement pagination in UI
+    async getProviderInternships(token: string) {
+        return this.request<any>('/internships/my?size=100', { token });
     }
 
-    async getApplicants(internshipId: string) {
-        return this.request<any>(`/internships/${internshipId}/applications?size=100`);
+    async getApplicants(token: string, internshipId: string) {
+        return this.request<any>(`/internships/${internshipId}/applications?size=100`, { token });
     }
 
     // Admin
-    async getAdminStats() {
-        return this.request<any>('/admin/stats');
+    async getAdminStats(token: string) {
+        return this.request<any>('/admin/stats', { token });
     }
 
-    async getAdminFairnessStats() {
-        return this.request<any>('/admin/fairness/stats');
+    async getAdminFairnessStats(token: string) {
+        return this.request<any>('/admin/fairness/stats', { token });
     }
 
-    async getUsers(page = 0, size = 10) {
-        return this.request<any>(`/admin/users?page=${page}&size=${size}`);
+    async getUsers(token: string, page = 0, size = 10) {
+        return this.request<any>(`/admin/users?page=${page}&size=${size}`, { token });
     }
 
-    async banUser(userId: string) {
-        return this.request<void>(`/admin/users/${userId}/ban`, { method: 'PATCH' });
+    async banUser(token: string, userId: string) {
+        return this.request<void>(`/admin/users/${userId}/ban`, { method: 'PATCH', token });
     }
 
-    async unbanUser(userId: string) {
-        return this.request<void>(`/admin/users/${userId}/unban`, { method: 'PATCH' });
+    async unbanUser(token: string, userId: string) {
+        return this.request<void>(`/admin/users/${userId}/unban`, { method: 'PATCH', token });
     }
 
-    async getAuditLogs(page = 0, size = 10) {
-        return this.request<any>(`/admin/audit-logs?page=${page}&size=${size}`);
+    async getAuditLogs(token: string, page = 0, size = 10) {
+        return this.request<any>(`/admin/audit-logs?page=${page}&size=${size}`, { token });
+    }
+
+    // ── Admin Internship Management ─────────────────────────
+    async getAdminInternships(token: string, page = 0, size = 10, status?: string) {
+        const statusParam = status ? `&status=${status}` : '';
+        return this.request<any>(`/admin/internships?page=${page}&size=${size}${statusParam}`, { token });
+    }
+
+    async adminUpdateInternshipStatus(token: string, internshipId: string, status: string) {
+        return this.request<any>(`/admin/internships/${internshipId}/status`, {
+            method: 'PATCH',
+            token,
+            body: JSON.stringify({ status }),
+        });
+    }
+
+    async adminDeleteInternship(token: string, internshipId: string) {
+        return this.request<void>(`/admin/internships/${internshipId}`, { method: 'DELETE', token });
     }
 }
 

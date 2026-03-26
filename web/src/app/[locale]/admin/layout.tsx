@@ -8,6 +8,8 @@ import Link from 'next/link';
 const NAV_ITEMS = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
     { href: '/admin/users', label: 'User Management', icon: '👤' },
+    { href: '/admin/internships', label: 'Internships', icon: '💼' },
+    { href: '/admin/fairness', label: 'Fairness', icon: '⚖️' },
     { href: '/admin/audit', label: 'Audit Logs', icon: '📋' },
 ];
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 import { useToast } from '@/components/ui/ToastProvider';
 
 type Props = {
@@ -11,6 +12,7 @@ type Props = {
 
 export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }: Props) {
     const toast = useToast();
+    const { token } = useAuth();
     const [loading, setLoading] = useState(false);
     const [form, setForm] = useState({
         fullName: '',
@@ -19,10 +21,12 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
         locationCity: '',
         locationState: '',
         interests: [] as string[],
-        resumeUrl: '',
+        linkedinUrl: '',
     });
     const [skills, setSkills] = useState<{ skillId: number; name: string; proficiency: number }[]>([]);
     const [newInterest, setNewInterest] = useState('');
+    const [cvFile, setCvFile] = useState<File | null>(null);
+    const [recLetters, setRecLetters] = useState<File[]>([]);
 
     // Skill input state
     const [skillSearch, setSkillSearch] = useState('');
@@ -38,12 +42,10 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                 locationCity: profile.locationCity || '',
                 locationState: profile.locationState || '',
                 interests: profile.interests || [],
-                resumeUrl: profile.resumeUrl || '',
+                linkedinUrl: profile.linkedinUrl || '',
             });
-            // Map profile skills to our format
-            // Assuming profile.skills is like [{ skillId, name, proficiency }] from API
-            setSkills(profile.skills.map((s: any) => ({
-                skillId: s.skillId,
+            setSkills((profile.skills || []).map((s: any) => ({
+                skillId: s.id,
                 name: s.name,
                 proficiency: s.proficiency
             })));
@@ -90,26 +92,30 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
         setLoading(true);
         try {
             // 1. Update Profile
-            await api.updateProfile(null as any, form); // token handled by interceptor? No, api.ts methods take token.
-            // Wait, api.ts methods require token. I need to use `useAuth` token.
-            // But this component doesn't have token. I should pass it or useAuth.
+            await api.updateProfile(token!, {
+                ...form,
+                linkedinUrl: form.linkedinUrl || null,
+            });
 
             // 2. Update Skills
-            // But wait, `updateSkills` endpoint expects UUIDs.
-            // If the user entered a NEW skill that doesn't exist, we can't get an ID.
-            // My Service logic for `updateProfile` WAS creating skills.
-            // `updateSkills` DOES NOT create skills, only links existing ones.
-            // This is a gap in the user's plan vs my implementation.
-            // I'll stick to the plan: `updateSkills` with IDs.
-            // This implies the user can only select existing skills.
-            // That's fine for now.
+            if (skills.length > 0) {
+                await api.updateSkills(token!, {
+                    skills: skills.map(s => ({
+                        skillId: s.skillId,
+                        proficiency: s.proficiency
+                    }))
+                });
+            }
 
-            await api.updateSkills(null as any, {
-                skills: skills.map(s => ({
-                    skillId: s.skillId,
-                    proficiency: s.proficiency
-                }))
-            });
+            // 3. Document Uploads
+            if (cvFile) {
+                await api.uploadDocument(token!, cvFile, 'CV');
+            }
+            if (recLetters.length > 0) {
+                for (const file of recLetters) {
+                    await api.uploadDocument(token!, file, 'RECOMMENDATION_LETTER');
+                }
+            }
 
             onSuccess();
             onClose();
@@ -127,24 +133,24 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
             <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-xl">
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                    <h2 className="text-2xl font-bold">Edit Profile</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h2>
 
                     {/* Basic Info */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Full Name</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Full Name</label>
                             <input
                                 type="text"
                                 required
-                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                                 value={form.fullName}
                                 onChange={e => setForm({ ...form, fullName: e.target.value })}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Education Level</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Education Level</label>
                             <select
-                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                                 value={form.educationLevel}
                                 onChange={e => setForm({ ...form, educationLevel: e.target.value })}
                             >
@@ -155,11 +161,11 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                             </select>
                         </div>
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium mb-1">University</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">University</label>
                             <input
                                 type="text"
                                 required
-                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                                 value={form.university}
                                 onChange={e => setForm({ ...form, university: e.target.value })}
                             />
@@ -169,42 +175,67 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                     {/* Location */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">City</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">City</label>
                             <input
                                 type="text"
                                 required
-                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                                 value={form.locationCity}
                                 onChange={e => setForm({ ...form, locationCity: e.target.value })}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">State</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">State</label>
                             <input
                                 type="text"
                                 required
-                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                                 value={form.locationState}
                                 onChange={e => setForm({ ...form, locationState: e.target.value })}
                             />
                         </div>
                     </div>
 
-                    {/* Resume URL */}
+                    {/* LinkedIn URL */}
                     <div>
-                        <label className="block text-sm font-medium mb-1">Resume URL</label>
+                        <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">LinkedIn URL</label>
                         <input
                             type="url"
-                            className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                            className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                             placeholder="https://linkedin.com/in/..."
-                            value={form.resumeUrl}
-                            onChange={e => setForm({ ...form, resumeUrl: e.target.value })}
+                            value={form.linkedinUrl}
+                            onChange={e => setForm({ ...form, linkedinUrl: e.target.value })}
                         />
+                    </div>
+
+                    {/* Documents */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 dark:border-gray-800">
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Upload CV (Optional, PDF/DOCX)</label>
+                            <input
+                                type="file"
+                                accept=".pdf,.docx"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+                                onChange={e => setCvFile(e.target.files?.[0] || null)}
+                            />
+                            {profile?.hasCv && !cvFile && <p className="text-xs text-green-600 mt-1">✓ CV already uploaded</p>}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">Recommendation Letters</label>
+                            <input
+                                type="file"
+                                multiple
+                                accept=".pdf,.docx"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+                                onChange={e => setRecLetters(Array.from(e.target.files || []))}
+                            />
+                            {profile?.recommendationLetterCount > 0 && <p className="text-xs text-green-600 mt-1">✓ {profile.recommendationLetterCount} letter(s) uploaded</p>}
+                        </div>
                     </div>
 
                     {/* Skills Section */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">Skills</label>
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Skills</label>
                         <div className="flex flex-wrap gap-2 mb-2">
                             {skills.map(skill => (
                                 <span key={skill.skillId} className="px-2 py-1 bg-primary-100 text-primary-700 rounded text-sm flex items-center gap-1">
@@ -222,7 +253,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                             <input
                                 type="text"
                                 placeholder="Search skills..."
-                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                                className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                                 value={skillSearch}
                                 onChange={e => {
                                     setSkillSearch(e.target.value);
@@ -239,7 +270,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                                         <button
                                             key={res.id}
                                             type="button"
-                                            className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                            className="w-full text-left px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-900 dark:text-white"
                                             onClick={() => {
                                                 if (!skills.find(s => s.skillId === res.id)) {
                                                     setSkills([...skills, { skillId: res.id, name: res.name, proficiency: 3 }]);
@@ -259,7 +290,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
 
                     {/* Interests */}
                     <div>
-                        <label className="block text-sm font-medium mb-2">Interests</label>
+                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Interests</label>
                         <div className="flex flex-wrap gap-2 mb-2">
                             {form.interests.map((interest, i) => (
                                 <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded flex items-center gap-1">
@@ -275,7 +306,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                         <input
                             type="text"
                             placeholder="Add interest + Enter"
-                            className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700"
+                            className="w-full p-2 rounded-lg border dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white"
                             value={newInterest}
                             onChange={e => setNewInterest(e.target.value)}
                             onKeyDown={e => {
@@ -292,7 +323,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                            className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                         >
                             Cancel
                         </button>

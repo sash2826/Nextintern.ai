@@ -13,8 +13,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,14 +38,15 @@ class SanitizationServiceTest {
     private ApplicationRepository applicationRepository;
     @Mock
     private EventPublisher eventPublisher;
+    @Mock
+    private StudentDocumentRepository documentRepository;
 
     private StudentProfileService studentProfileService;
-    private InternshipService internshipService;
     private ApplicationService applicationService;
 
     @BeforeEach
     void setUp() {
-        studentProfileService = new StudentProfileService(studentProfileRepository, userRepository, skillRepository);
+        studentProfileService = new StudentProfileService(studentProfileRepository, userRepository, skillRepository, documentRepository);
         // InternshipService needs SearchService? Let's check constructor.
         // Assuming nullable or mocked SearchService if needed.
         // Checking InternshipService.java constructor from previous view...
@@ -104,7 +103,7 @@ class SanitizationServiceTest {
     void testApplicationSanitization() {
         // Arrange
         applicationService = new ApplicationService(applicationRepository, internshipRepository,
-                studentProfileRepository, providerRepository, eventPublisher);
+                studentProfileRepository, eventPublisher);
 
         UUID userId = UUID.randomUUID();
         UUID internshipId = UUID.randomUUID();

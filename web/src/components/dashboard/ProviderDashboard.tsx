@@ -13,7 +13,7 @@ export default function ProviderDashboard() {
     useEffect(() => {
         if (!token) return;
 
-        api.getMyInternships().then((res) => {
+        api.getMyInternships(token!).then((res) => {
             setInternships(res.content || []);
         }).finally(() => setLoading(false));
     }, [token]);

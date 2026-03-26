@@ -191,7 +191,7 @@ public class InternshipService {
                                 .map(i -> toResponse(i, counts.getOrDefault(i.getId(), 0L)))
                                 .collect(Collectors.toList());
 
-                return new PageImpl(responseList, PageRequest.of(page, size), result.total());
+                return new PageImpl<>(responseList, PageRequest.of(page, size), result.total());
 
         }
 
@@ -206,10 +206,11 @@ public class InternshipService {
                 List<Internship> internships = pageResult.getContent();
                 List<UUID> ids = internships.stream().map(Internship::getId).collect(Collectors.toList());
 
-                Map<UUID, Long> counts = internshipRepository.countActiveApplicationsByIds(ids).stream()
-                                .collect(Collectors.toMap(
-                                                row -> (UUID) row[0],
-                                                row -> (Long) row[1]));
+                Map<UUID, Long> counts = ids.isEmpty() ? Collections.emptyMap()
+                                : internshipRepository.countActiveApplicationsByIds(ids).stream()
+                                                .collect(Collectors.toMap(
+                                                                row -> (UUID) row[0],
+                                                                row -> (Long) row[1]));
 
                 return pageResult.map(i -> toResponse(i, counts.getOrDefault(i.getId(), 0L)));
         }

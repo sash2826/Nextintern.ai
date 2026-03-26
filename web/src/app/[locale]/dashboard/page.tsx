@@ -11,8 +11,12 @@ export default function DashboardPage() {
     const router = useRouter();
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push('/login');
+        if (!loading) {
+            if (!user) {
+                router.push('/login');
+            } else if (user.roles.includes('ROLE_ADMIN')) {
+                router.replace('/admin/dashboard');
+            }
         }
     }, [user, loading, router]);
 
@@ -25,6 +29,8 @@ export default function DashboardPage() {
     }
 
     if (!user) return null; // Will redirect
+
+    if (user.roles.includes('ROLE_ADMIN')) return null; // Wait for redirect
 
     return (
         <main className="min-h-screen bg-gray-50 dark:bg-gray-950 pt-20">

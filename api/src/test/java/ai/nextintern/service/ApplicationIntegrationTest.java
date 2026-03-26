@@ -5,10 +5,8 @@ import ai.nextintern.dto.ApplicationResponse;
 import ai.nextintern.dto.ApplyRequest;
 import ai.nextintern.dto.UpdateApplicationStatusRequest;
 import ai.nextintern.entity.*;
-import ai.nextintern.event.EventConsumer;
 import ai.nextintern.event.EventPublisher;
 import ai.nextintern.repository.*;
-import io.awspring.cloud.sqs.operations.SqsTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -18,7 +16,6 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -55,9 +52,6 @@ class ApplicationIntegrationTest {
 
         @SpyBean
         private EventPublisher eventPublisher;
-
-        @Autowired // Real SqsTemplate connected to LocalStack from application-test.yml
-        private SqsTemplate sqsTemplate;
 
         @Autowired
         private UserRepository userRepository;

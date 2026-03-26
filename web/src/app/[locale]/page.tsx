@@ -1,6 +1,32 @@
+'use client';
+
 import Link from 'next/link';
+import { useAuth } from '@/lib/auth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function HomePage() {
+    const { user, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && user) {
+            if (user.roles.includes('ROLE_ADMIN')) {
+                router.replace('/admin/dashboard');
+            } else {
+                router.replace('/dashboard');
+            }
+        }
+    }, [user, loading, router]);
+
+    if (loading || user) {
+        return (
+            <div className="min-h-screen bg-[#1e1b4b] flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+            </div>
+        );
+    }
+
     return (
         <main className="min-h-screen">
             {/* ── Hero Section ──────────────────────────────────── */}

@@ -71,6 +71,16 @@ async def recommend(request: Request, body: RecommendRequest, background_tasks: 
     """
     start = time.time()
 
+    if len(body.profile.skills) < 3:
+        return RecommendResponse(
+            items=[],
+            model_version="hybrid-v0.2.0",
+            cold_start=True,
+            strategy="needs_more_skills",
+            latency_ms=int((time.time() - start) * 1000),
+            fairness_metrics={}
+        )
+
     result = await scorer.score(
         user_id=body.user_id,
         profile=body.profile,
@@ -94,7 +104,7 @@ async def recommend(request: Request, body: RecommendRequest, background_tasks: 
 
     # --- Analytics Logging ---
     # Extract IDs to log
-    internship_ids = [getattr(item, "internship_id", item.get("internship_id") if isinstance(item, dict) else None) for item in result["items"]]
+    internship_ids = [item["internship_id"] for item in result["items"]]
     
     background_tasks.add_task(
         log_recommendation,

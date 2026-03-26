@@ -29,7 +29,7 @@ class LightFMScorer:
         self.cand_user_mapping = {}
         self.cand_item_mapping = {}
         self.cand_ready = False
-        self._reload_lock = asyncio.Lock()
+        self._reload_lock = None  # Lazily created inside async context
         self._load_production_model()
         
     def _load_production_model(self):
@@ -56,6 +56,8 @@ class LightFMScorer:
 
     async def reload_production_model(self):
         """Hot-reload the production model safely."""
+        if self._reload_lock is None:
+            self._reload_lock = asyncio.Lock()
         async with self._reload_lock:
             base_model_dir = await asyncio.to_thread(self._load_production_model)
                 

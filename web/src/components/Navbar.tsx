@@ -8,16 +8,16 @@ import { useTranslations } from 'next-intl';
 import { api } from '@/lib/api';
 
 export function Navbar() {
-    const { user, logout, loading } = useAuth();
+    const { user, token, logout, loading } = useAuth();
     const [menuOpen, setMenuOpen] = useState(false);
     const t = useTranslations('Navbar');
     const router = useRouter();
     const pathname = usePathname();
 
     const handleLocaleChange = async (newLocale: string) => {
-        if (user) {
+        if (user && token) {
             try {
-                await api.updateLocale(newLocale);
+                await api.updateLocale(token, newLocale);
             } catch (e) {
                 console.error('Failed to update locale preference', e);
             }
@@ -74,7 +74,15 @@ export function Navbar() {
                         {!loading && (
                             user ? (
                                 <div className="flex items-center gap-4">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">{user.fullName}</span>
+                                    <Link 
+                                        href={user.roles.includes('ROLE_ADMIN') ? '/admin/dashboard' : '/dashboard'} 
+                                        className="flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition-colors border border-transparent hover:border-gray-200 dark:hover:border-gray-700"
+                                    >
+                                        <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center text-primary-700 dark:text-primary-400 font-bold shadow-inner">
+                                            {user.fullName.charAt(0).toUpperCase()}
+                                        </div>
+                                        <span className="text-sm font-semibold text-black dark:text-white">{user.fullName}</span>
+                                    </Link>
                                     <button
                                         onClick={logout}
                                         className="text-sm px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 font-medium transition-colors"

@@ -13,6 +13,8 @@ from datetime import date, timedelta
 from typing import Optional
 from uuid import UUID
 
+import asyncio
+
 import sqlalchemy as sa
 from sqlalchemy import create_engine, text
 
@@ -40,7 +42,7 @@ class ContentScorer:
     ) -> list:
         """Score all active internships against the user profile."""
 
-        internships = self._fetch_active_internships(exclude_ids)
+        internships = await asyncio.to_thread(self._fetch_active_internships, exclude_ids)
 
         if not internships:
             return []
@@ -59,8 +61,13 @@ class ContentScorer:
                 + 0.1 * recency_bonus
             )
 
+            matched_skill_names = self._matched_skill_names(profile.skills, internship["skills"])
+            missing_skill_names = self._missing_skill_names(profile.skills, internship["skills"])
+
             explanation = {
-                "matchedSkills": self._matched_skill_names(profile.skills, internship["skills"]),
+                "matchedSkills": matched_skill_names,
+                "missingSkills": missing_skill_names,
+                "matchScore": round(skill_score, 3),
                 "skillOverlapScore": round(skill_score, 3),
                 "locationMatch": location_score > 0,
                 "interestOverlap": self._matched_interests(profile.interests, internship),
@@ -185,6 +192,15 @@ class ContentScorer:
             s.get("name", "")
             for s in internship_skills
             if s.get("name", "").lower() in user_names
+        ]
+
+    def _missing_skill_names(self, user_skills: list[dict], internship_skills: list) -> list[str]:
+        """Return names of skills required by internship but missing from user."""
+        user_names = {s.get("name", "").lower() for s in user_skills}
+        return [
+            s.get("name", "")
+            for s in internship_skills
+            if s.get("name", "").lower() not in user_names
         ]
 
     def _matched_interests(self, user_interests: list[str], internship: dict) -> list[str]:

@@ -8,7 +8,6 @@ import ai.nextintern.entity.Internship;
 import ai.nextintern.entity.StudentProfile;
 import ai.nextintern.repository.ApplicationRepository;
 import ai.nextintern.repository.InternshipRepository;
-import ai.nextintern.repository.ProviderRepository;
 import ai.nextintern.repository.StudentProfileRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,18 +33,15 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final InternshipRepository internshipRepository;
     private final StudentProfileRepository studentProfileRepository;
-    private final ProviderRepository providerRepository; // Kept for consistency if needed later
     private final EventPublisher eventPublisher;
 
     public ApplicationService(ApplicationRepository applicationRepository,
             InternshipRepository internshipRepository,
             StudentProfileRepository studentProfileRepository,
-            ProviderRepository providerRepository,
             EventPublisher eventPublisher) {
         this.applicationRepository = applicationRepository;
         this.internshipRepository = internshipRepository;
         this.studentProfileRepository = studentProfileRepository;
-        this.providerRepository = providerRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -234,7 +230,7 @@ public class ApplicationService {
                 student.getId(),
                 user != null ? user.getFullName() : "Unknown",
                 user != null ? user.getEmail() : "",
-                student.getResumeUrl(),
+                student.getLinkedinUrl(),
                 student.getEducationLevel(),
                 student.getUniversity());
 

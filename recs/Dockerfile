@@ -30,7 +30,7 @@ RUN useradd -m -s /bin/bash appuser
 WORKDIR /app
 
 COPY --from=builder /wheels /wheels
-RUN pip install --no-cache-dir --no-index --find-links=/wheels /wheels/* \
+RUN pip install --no-cache-dir --no-index --find-links=/wheels /wheels/*.whl \
     && rm -rf /wheels \
     && pip install --no-cache-dir "gunicorn>=22.0.0"
 

@@ -27,7 +27,7 @@ export default function InternshipDetailPage() {
             .then(data => {
                 setIntern(data);
                 if (token && user?.roles.includes('ROLE_STUDENT')) {
-                    api.getMyApplications(0, 100).then(res => {
+                    api.getMyApplications(token!, 0, 100).then(res => {
                         const existing = res.content?.find((a: any) => a.internship.id === id);
                         setApplication(existing);
                     }).catch(() => { });
@@ -44,7 +44,7 @@ export default function InternshipDetailPage() {
         }
         setApplying(true);
         try {
-            const res = await api.apply(intern.id, coverNote);
+            const res = await api.apply(token!, intern.id, coverNote);
             setApplication(res);
             setShowApplyModal(false);
             toast.success('Application submitted successfully! 🎉');

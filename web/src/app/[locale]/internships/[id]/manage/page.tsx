@@ -23,7 +23,7 @@ export default function ManageApplicationsPage() {
         // Fetch internship details + applications
         Promise.all([
             api.getInternship(id as string),
-            api.getInternshipApplications(id as string).catch(() => ({ content: [] }))
+            api.getInternshipApplications(token!, id as string).catch(() => ({ content: [] }))
         ]).then(([internData, appsData]) => {
             // Permission check on client (backend also checks)
             if (user?.id !== internData.provider?.id) {
@@ -40,7 +40,7 @@ export default function ManageApplicationsPage() {
     const handleStatusUpdate = async (appId: string, status: string) => {
         if (!confirm(`Are you sure you want to mark this applicant as ${status}?`)) return;
         try {
-            await api.updateApplicationStatus(appId, status);
+            await api.updateApplicationStatus(token!, appId, status);
             // Optimistic update
             setApplications(apps => apps.map(a =>
                 a.id === appId ? { ...a, status } : a
