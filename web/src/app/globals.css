@@ -51,7 +51,11 @@ html {
 }
 
 body {
-  background: #ffffff;
+  background-color: #ffffff;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.03) 0px, transparent 50%);
+  background-attachment: fixed;
   color: #111827;
   min-height: 100vh;
 }
@@ -59,7 +63,11 @@ body {
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   body {
-    background: #030712;
+    background-color: #030712;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(8, 145, 178, 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
     color: #f9fafb;
   }
 }
@@ -256,6 +264,11 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @keyframes scale-in {
@@ -654,4 +667,20 @@ body {
   50% {
     opacity: 0.5;
   }
+}
+
+/* Landing page hero animations */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }

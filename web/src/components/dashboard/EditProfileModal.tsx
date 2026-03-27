@@ -102,6 +102,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                 await api.updateSkills(token!, {
                     skills: skills.map(s => ({
                         skillId: s.skillId,
+                        name: s.name,
                         proficiency: s.proficiency
                     }))
                 });
@@ -117,6 +118,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                 }
             }
 
+            toast.success('Profile updated successfully! 🎉');
             onSuccess();
             onClose();
         } catch (err) {
