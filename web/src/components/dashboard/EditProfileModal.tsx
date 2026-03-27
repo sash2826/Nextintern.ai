@@ -293,7 +293,7 @@ export default function EditProfileModal({ isOpen, onClose, profile, onSuccess }
                         <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">Interests</label>
                         <div className="flex flex-wrap gap-2 mb-2">
                             {form.interests.map((interest, i) => (
-                                <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded flex items-center gap-1">
+                                <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded flex items-center gap-1">
                                     {interest}
                                     <button
                                         type="button"

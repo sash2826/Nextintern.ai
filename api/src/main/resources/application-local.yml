@@ -3,6 +3,9 @@ spring:
     aws:
       sqs:
         endpoint: http://localhost:4566
+      s3:
+        endpoint: http://localhost:4566
+        bucket: nextintern-documents
       credentials:
         access-key: test
         secret-key: test
