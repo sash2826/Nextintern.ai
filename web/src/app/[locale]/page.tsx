@@ -4,10 +4,12 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { MOCK_INTERNSHIPS } from '@/lib/mockInternships';
 
 export default function HomePage() {
     const { user, loading } = useAuth();
     const router = useRouter();
+    const featuredInternships = MOCK_INTERNSHIPS.slice(0, 3);
 
     useEffect(() => {
         if (!loading && user) {
@@ -81,59 +83,48 @@ export default function HomePage() {
                         AI-Powered Recommendation Engine
                     </div>
 
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-tight tracking-tight">
-                        Find Your
-                        <br />
-                        <span
-                            style={{
-                                background: 'linear-gradient(135deg, #67e8f9, #a5f3fc, #e0e7ff)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                            }}
-                        >
-                            Perfect Internship
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white px-2 mb-6 tracking-tight" style={{ lineHeight: 1.15 }}>
+                        Accelerate Your Career with <br className="hidden md:block" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-200 to-indigo-300 drop-shadow-[0_0_30px_rgba(34,211,238,0.3)]">
+                            AI-Powered Internships
                         </span>
                     </h1>
 
-                    <p className="mt-6 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
-                        NextIntern.ai matches students with internships using explainable AI.
-                        Get personalized recommendations based on your skills, interests, and career goals.
+                    <p className="mt-8 text-lg sm:text-2xl text-white/80 max-w-3xl mx-auto leading-relaxed font-medium">
+                        NextIntern.ai matches ambitious students with top companies using explainable AI.
+                        Get highly personalized recommendations based on your unique skills and aspirations.
                     </p>
 
-                    <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6">
                         <Link
                             href="/register"
-                            className="px-8 py-4 rounded-xl text-lg font-semibold text-white shadow-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-cyan-500/25"
-                            style={{
-                                background: 'linear-gradient(135deg, #4f46e5, #0891b2)',
-                            }}
+                            className="px-10 py-5 rounded-2xl text-lg font-bold text-indigo-950 bg-white shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all duration-300 hover:-translate-y-1 hover:bg-cyan-50 hover:shadow-[0_0_60px_rgba(34,211,238,0.5)] flex items-center gap-2"
                         >
-                            Get Started — It&apos;s Free
+                            Get Started Free <span>🚀</span>
                         </Link>
                         <Link
                             href="/internships"
-                            className="px-8 py-4 rounded-xl text-lg font-semibold text-white border-2 border-white/20 hover:bg-white/10 transition-all duration-300"
+                            className="px-10 py-5 rounded-2xl text-lg font-bold text-white border-2 border-white/20 hover:bg-white/10 hover:border-white/40 backdrop-blur-sm transition-all duration-300 flex items-center gap-2"
                         >
-                            Browse Internships →
+                            Explore Opportunities <span>→</span>
                         </Link>
                     </div>
 
                     {/* Trust metrics */}
-                    <div className="mt-16 flex flex-wrap items-center justify-center gap-8 text-white/60 text-sm">
-                        <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-white">10+</span>
-                            <span>Internships</span>
+                    <div className="mt-20 flex flex-wrap items-center justify-center gap-10 text-white/70 text-base font-medium">
+                        <div className="flex items-center gap-3">
+                            <span className="text-3xl font-black text-white">10k+</span>
+                            <span className="text-left leading-tight">Active<br/>Students</span>
                         </div>
-                        <div className="w-px h-6 bg-white/20" />
-                        <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-white">5</span>
-                            <span>Companies</span>
+                        <div className="w-px h-10 bg-white/20" />
+                        <div className="flex items-center gap-3">
+                            <span className="text-3xl font-black text-white">50+</span>
+                            <span className="text-left leading-tight">Hiring<br/>Companies</span>
                         </div>
-                        <div className="w-px h-6 bg-white/20" />
-                        <div className="flex items-center gap-2">
-                            <span className="text-2xl font-bold text-white">AI</span>
-                            <span>Explainable Matching</span>
+                        <div className="w-px h-10 bg-white/20" />
+                        <div className="flex items-center gap-3">
+                            <span className="text-3xl font-black text-white">94%</span>
+                            <span className="text-left leading-tight">Match<br/>Accuracy</span>
                         </div>
                     </div>
                 </div>
@@ -146,8 +137,101 @@ export default function HomePage() {
                 </div>
             </section>
 
+            {/* ── Trusted by Companies ────────────────────────── */}
+            <section className="py-10 bg-white border-y border-gray-100 dark:bg-gray-900/50 dark:border-gray-800">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <p className="text-sm font-bold text-gray-400 tracking-widest uppercase mb-8">Top tech companies hiring talent on NextIntern.ai</p>
+                    <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+                        {['Google', 'Microsoft', 'Amazon', 'Meta', 'Netflix', 'Stripe'].map(company => (
+                            <span key={company} className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white opacity-80">
+                                {company}
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Featured Internships ──────────────────────── */}
+            <section className="py-24 bg-gray-50 dark:bg-gray-950/50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+                        <div className="max-w-2xl">
+                            <h2 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight">Featured Opportunities</h2>
+                            <p className="mt-4 text-lg text-gray-500 dark:text-gray-400 leading-relaxed">Hand-picked internships to kickstart your career. Apply early to secure your spot.</p>
+                        </div>
+                        <Link href="/internships" className="inline-flex items-center gap-2 text-primary-600 font-bold hover:text-primary-700 hover:gap-3 transition-all">
+                            View all internships <span>→</span>
+                        </Link>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {featuredInternships.map(intern => (
+                            <Link key={intern.id} href={`/internships/${intern.id}`}>
+                                <div className="group bg-white dark:bg-gray-900 rounded-[2rem] border border-gray-200 dark:border-gray-800 p-8 hover:shadow-2xl hover:shadow-primary-500/10 hover:border-primary-300 dark:hover:border-primary-700 transition-all duration-500 hover:-translate-y-2 cursor-pointer h-full flex flex-col relative overflow-hidden">
+                                     <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-primary-500/10 to-accent-500/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
+                                    <div className="relative z-10 flex flex-col h-full">
+                                        <div className="flex items-start justify-between mb-6">
+                                            <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-2xl font-black text-gray-300 dark:text-gray-600 border border-gray-100 dark:border-gray-700">
+                                                {intern.provider.companyName.charAt(0)}
+                                            </div>
+                                            <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 border border-primary-100 dark:border-primary-900/50">
+                                                {intern.category}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-primary-600 transition-colors mb-2 line-clamp-2">
+                                            {intern.title}
+                                        </h3>
+                                        <p className="text-base font-medium text-gray-500 dark:text-gray-400 mb-6">{intern.provider.companyName}</p>
+                                        
+                                        <div className="flex flex-wrap gap-2 mb-8 mt-auto">
+                                            <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-gray-800/50">
+                                                📍 {intern.locationCity || 'Remote'}
+                                            </span>
+                                            <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-gray-800/50">
+                                                ⏳ {intern.durationWeeks} weeks
+                                            </span>
+                                        </div>
+                                        
+                                        <div className="pt-5 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                                            <span className="text-lg font-black text-gray-900 dark:text-white">
+                                                {intern.stipendMin ? `₹${(intern.stipendMin/1000).toFixed(0)}k` : 'Unpaid'}<span className="text-sm text-gray-400 font-medium">/mo</span>
+                                            </span>
+                                            <span className="text-sm font-bold text-primary-600 bg-primary-50 dark:bg-primary-900/20 px-4 py-2 rounded-xl group-hover:bg-primary-600 group-hover:text-white transition-colors flex gap-1 items-center">
+                                                Apply <span className="hidden group-hover:inline">Now</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Impact Section ──────────────────────────────── */}
+            <section className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden border-y border-gray-100 dark:border-gray-800">
+                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, var(--primary-500) 1px, transparent 0)', backgroundSize: '48px 48px' }} />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+                        {[
+                            { label: 'Active Students', value: '10,000+' },
+                            { label: 'Internships Posted', value: '5,000+' },
+                            { label: 'Partner Companies', value: '500+' },
+                            { label: 'Success Match Rate', value: '94%' },
+                        ].map((stat, i) => (
+                            <div key={i} className="p-6">
+                                <div className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-accent-600 mb-3 drop-shadow-sm">
+                                    {stat.value}
+                                </div>
+                                <div className="text-lg font-bold text-gray-600 dark:text-gray-400">{stat.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* ── Features Section ──────────────────────────────── */}
-            <section className="py-24 bg-white dark:bg-gray-950">
+            <section className="py-24 bg-gray-50 dark:bg-gray-950">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
                         <h2 className="text-4xl font-bold text-gray-900 dark:text-white">How It Works</h2>
@@ -222,12 +306,13 @@ export default function HomePage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
-                                <span className="text-white font-bold text-sm">NI</span>
-                            </div>
-                            <span className="text-white font-bold">NextIntern.ai</span>
+                            <img 
+                                src="/nextintern-logo-transparent.png" 
+                                alt="NextIntern.ai" 
+                                className="h-14 w-auto object-contain"
+                            />
                         </div>
-                        <p className="text-sm">© 2026 NextIntern.ai — AI-powered internship matching</p>
+                        <p className="text-sm">© 2026 NextIntern.ai — Fueling Careers in AI</p>
                         <div className="flex gap-6 text-sm">
                             <Link href="/internships" className="hover:text-white transition-colors">Browse</Link>
                             <Link href="/login" className="hover:text-white transition-colors">Login</Link>

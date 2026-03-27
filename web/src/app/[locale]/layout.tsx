@@ -10,7 +10,7 @@ import { ToastProvider } from '@/components/ui/ToastProvider';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-    title: 'NextIntern.ai',
+    title: 'NextIntern.ai | Fueling Careers in AI',
     description: 'AI-powered internship platform',
     manifest: '/manifest.json',
 };
