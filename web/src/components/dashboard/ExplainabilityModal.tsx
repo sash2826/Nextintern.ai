@@ -77,12 +77,9 @@ export default function ExplainabilityModal({ isOpen, onClose, recommendation }:
         percent >= 50 ? ['#f59e0b', '#ef4444'] : ['#ef4444', '#dc2626'];
 
     return (
-        <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true">
-            <div className="min-h-screen px-4 text-center">
-                {/* Trick to vertically center modal without flex (which causes clipping on tall content) */}
-                <span className="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
-                <div className="inline-block w-full max-w-xl my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden relative" onClick={(e) => e.stopPropagation()}
-                    style={{ animation: 'fadeInUp 0.3s ease-out' }}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true">
+            <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto text-left transition-all transform bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 relative" onClick={(e) => e.stopPropagation()}
+                style={{ animation: 'fadeInUp 0.3s ease-out' }}>
 
                 {/* ── Gradient Header ──────────────────────────── */}
                 <div className="relative p-6 pb-8 overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 70%, #0891b2 100%)' }}>
@@ -271,7 +268,7 @@ export default function ExplainabilityModal({ isOpen, onClose, recommendation }:
                 </div>
 
                 {/* ── Footer ──────────────────────────────────── */}
-                <div className="p-5 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
+                <div className="p-5 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3 sticky bottom-0 z-20 rounded-b-3xl">
                     <button onClick={onClose} className="px-5 py-2.5 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-sm">
                         Dismiss
                     </button>
@@ -280,7 +277,6 @@ export default function ExplainabilityModal({ isOpen, onClose, recommendation }:
                         View Internship →
                     </Link>
                 </div>
-            </div>
             </div>
         </div>
     );
