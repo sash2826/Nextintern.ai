@@ -77,8 +77,8 @@ export default function ExplainabilityModal({ isOpen, onClose, recommendation }:
         percent >= 50 ? ['#f59e0b', '#ef4444'] : ['#ef4444', '#dc2626'];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true">
-            <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto text-left transition-all transform bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 relative" onClick={(e) => e.stopPropagation()}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true">
+            <div className="w-full max-w-xl max-h-[85vh] mt-10 overflow-y-auto text-left transition-all transform bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 relative" onClick={(e) => e.stopPropagation()}
                 style={{ animation: 'fadeInUp 0.3s ease-out' }}>
 
                 {/* ── Gradient Header ──────────────────────────── */}
@@ -244,6 +244,48 @@ export default function ExplainabilityModal({ isOpen, onClose, recommendation }:
                                 ) : (
                                     <p className="text-xs text-gray-500 dark:text-gray-400">Category and industry alignment analyzed.</p>
                                 )}
+                            </div>
+
+                            {/* Growth Potential */}
+                            <div className="p-4 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-sm">🌱</span>
+                                    <span className="text-sm font-bold text-gray-900 dark:text-white">Growth Potential</span>
+                                </div>
+                                <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">
+                                    {internship.title.includes('Data') || internship.title.includes('Analytics') ? 'High demand for data skills in the current market. This role offers strong career progression into Data Engineering or ML.' :
+                                     internship.title.includes('Develop') || internship.title.includes('Engineer') ? 'Software engineering roles offer versatile career paths. This internship builds a solid foundation for senior positions.' :
+                                     'This internship provides valuable industry experience that accelerates your career growth and expands your professional network.'}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    <span className="px-2 py-1 bg-orange-50 dark:bg-orange-900/10 text-orange-700 dark:text-orange-400 text-[10px] font-bold rounded-md">📈 High Market Demand</span>
+                                    <span className="px-2 py-1 bg-orange-50 dark:bg-orange-900/10 text-orange-700 dark:text-orange-400 text-[10px] font-bold rounded-md">🔗 Networking Opportunities</span>
+                                </div>
+                            </div>
+
+                            {/* Action Plan */}
+                            <div className="p-4 bg-white dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-sm">🚀</span>
+                                    <span className="text-sm font-bold text-gray-900 dark:text-white">Recommended Action Plan</span>
+                                </div>
+                                <ul className="space-y-2">
+                                    {missingCount > 0 ? (
+                                        <li className="flex gap-2 text-xs text-gray-600 dark:text-gray-300">
+                                            <span className="text-indigo-500 font-bold">1.</span>
+                                            <span>Take a crash course in <strong>{explanation.missingSkills?.[0]}</strong> to boost your match score.</span>
+                                        </li>
+                                    ) : (
+                                        <li className="flex gap-2 text-xs text-gray-600 dark:text-gray-300">
+                                            <span className="text-indigo-500 font-bold">1.</span>
+                                            <span>Your skills align perfectly! Highlight your <strong>{explanation.matchedSkills?.[0]}</strong> experience in your cover letter.</span>
+                                        </li>
+                                    )}
+                                    <li className="flex gap-2 text-xs text-gray-600 dark:text-gray-300">
+                                        <span className="text-indigo-500 font-bold">2.</span>
+                                        <span>Research <strong className="text-gray-900 dark:text-white">{companyName}</strong>'s recent projects to prepare for the interviews.</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
