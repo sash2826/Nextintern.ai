@@ -62,10 +62,11 @@ public class DocumentController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
 
         if (type == StudentDocument.DocumentType.CV) {
-            long cvCount = documentRepository.countByStudentProfileIdAndDocumentType(profile.getId(), StudentDocument.DocumentType.CV);
-            if (cvCount > 0) {
-                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only 1 CV is allowed per user");
-            }
+            documentRepository.findByStudentProfileIdAndDocumentType(profile.getId(), StudentDocument.DocumentType.CV)
+                    .ifPresent(oldDoc -> {
+                        storageService.delete(oldDoc.getFileUrl());
+                        documentRepository.delete(oldDoc);
+                    });
         }
 
         String fileUrl = storageService.upload(file);
