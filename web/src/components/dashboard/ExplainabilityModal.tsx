@@ -77,10 +77,12 @@ export default function ExplainabilityModal({ isOpen, onClose, recommendation }:
         percent >= 50 ? ['#f59e0b', '#ef4444'] : ['#ef4444', '#dc2626'];
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true">
-            <div className="min-h-full flex items-start justify-center p-4 pt-20 pb-8">
-            <div className="relative w-full max-w-xl bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden" onClick={(e) => e.stopPropagation()}
-                style={{ animation: 'fadeInUp 0.3s ease-out' }}>
+        <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/60 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true">
+            <div className="min-h-screen px-4 text-center">
+                {/* Trick to vertically center modal without flex (which causes clipping on tall content) */}
+                <span className="inline-block h-screen align-middle" aria-hidden="true">&#8203;</span>
+                <div className="inline-block w-full max-w-xl my-8 text-left align-middle transition-all transform bg-white dark:bg-gray-900 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden relative" onClick={(e) => e.stopPropagation()}
+                    style={{ animation: 'fadeInUp 0.3s ease-out' }}>
 
                 {/* ── Gradient Header ──────────────────────────── */}
                 <div className="relative p-6 pb-8 overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #4338ca 70%, #0891b2 100%)' }}>
